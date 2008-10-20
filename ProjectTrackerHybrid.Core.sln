@@ -1,0 +1,49 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual Studio 2008
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProjectTracker.Library.Hybrid", "ProjectTrackerHybrid.Core\ProjectTracker.Library.Hybrid.csproj", "{F3EDBC65-1038-4268-99CA-DDF271D35728}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Lib", "Lib", "{1ACC10C1-8F64-43B4-8AA9-84A3C32152DF}"
+	ProjectSection(SolutionItems) = preProject
+		Lib\Csla.dll = Lib\Csla.dll
+		Lib\FluentNHibernate.dll = Lib\FluentNHibernate.dll
+		Lib\NHibernate.dll = Lib\NHibernate.dll
+		Lib\Rhino.Mocks.dll = Lib\Rhino.Mocks.dll
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProjectTracker.Library.Tests", "ProjectTrackerHybrid.Core.Tests\ProjectTracker.Library.Tests.csproj", "{52243D92-8450-416C-9E20-C8A235420097}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{A1C5B264-2A52-47B1-96B0-17676157ED25}"
+	ProjectSection(SolutionItems) = preProject
+		LocalTestRun.testrunconfig = LocalTestRun.testrunconfig
+		ProjectTrackerHybrid.Core.vsmdi = ProjectTrackerHybrid.Core.vsmdi
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PTWin", "PTWin\PTWin.csproj", "{DAB85BA2-86A3-4D3B-8D34-324D939D952C}"
+EndProject
+Global
+	GlobalSection(TestCaseManagementSettings) = postSolution
+		CategoryFile = ProjectTrackerHybrid.Core.vsmdi
+	EndGlobalSection
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{F3EDBC65-1038-4268-99CA-DDF271D35728}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F3EDBC65-1038-4268-99CA-DDF271D35728}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F3EDBC65-1038-4268-99CA-DDF271D35728}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F3EDBC65-1038-4268-99CA-DDF271D35728}.Release|Any CPU.Build.0 = Release|Any CPU
+		{52243D92-8450-416C-9E20-C8A235420097}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{52243D92-8450-416C-9E20-C8A235420097}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{52243D92-8450-416C-9E20-C8A235420097}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{52243D92-8450-416C-9E20-C8A235420097}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DAB85BA2-86A3-4D3B-8D34-324D939D952C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DAB85BA2-86A3-4D3B-8D34-324D939D952C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DAB85BA2-86A3-4D3B-8D34-324D939D952C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DAB85BA2-86A3-4D3B-8D34-324D939D952C}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
