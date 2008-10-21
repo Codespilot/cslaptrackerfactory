@@ -11,25 +11,49 @@ using Csla.Security;
 
 namespace ProjectTracker.Library
 {
+    // NOTICE THE NEW ATTRIBUTES AND THE CLASS SIGNATURE HAS CHANGED
     [CslaFactory("Factory Type=IBusinessBaseServerFactory;Item Type=ProjectTracker.Library.Project, ProjectTracker.Library")]
     [DatabaseKey(Database.PTrackerDb)]
-    [Serializable()]
+    [Serializable]
     public class Project :  PTBusinessBase<Project>
     {
+        #region New/Modified Business Methods
 
-        #region  Business Methods
+        /// <summary>
+        /// This is modified from the Csla Default to be null. This is so
+        /// NHibernate knows what to do with the TimeStamp
+        /// </summary>
+        private byte[] timeStamp = null;
 
-        //
-        private byte[] mTimestamp = new byte[8];
+        internal byte[] TimeStamp
+        {
+            get { return timeStamp; }
+            set { timeStamp = value; }
+        }
 
-        private static PropertyInfo<Guid> IdProperty =
-          RegisterProperty<Guid>(typeof(Project), new PropertyInfo<Guid>("Id"));
-//        [System.ComponentModel.DataObjectField(true, true)]
+        private static PropertyInfo<Guid> IdProperty = RegisterProperty<Guid>(typeof(Project), new PropertyInfo<Guid>("Id"));
+        // Not Needed [System.ComponentModel.DataObjectField(true, true)]
         public Guid Id
         {
             get { return GetProperty<Guid>(IdProperty); }
-            set { SetProperty<Guid>(IdProperty, value);}
+            internal set { SetProperty<Guid>(IdProperty, value); } // We need to have a Set for NHibernate, this can be internal though
         }
+
+        /// <summary>
+        /// New Property/Field combination for NHibernate. NHibernate only wants to load and set an IList object
+        /// so that is what we feed it.
+        /// </summary>
+        [NotUndoable]
+        private IList<ProjectResource> _resourcesSet = ProjectResources.NewProjectResources();
+        public IList<ProjectResource> ResourcesSet
+        {
+            get { return Resources as IList<ProjectResource>; }
+            set { Resources.Add(value); }
+        }
+
+        #endregion
+
+        #region  Business Methods
 
         private static PropertyInfo<string> NameProperty = RegisterProperty(new PropertyInfo<string>("Name"));
         public string Name
@@ -70,22 +94,7 @@ namespace ProjectTracker.Library
                 }
                 return GetProperty<ProjectResources>(ResourcesProperty);
             }
-            //internal set
-            //{
-            //    SetProperty<ProjectResources>(ResourcesProperty, value);
-            //}
         }
-        [NotUndoable]
-        private IList<ProjectResource> _resourcesSet = ProjectResources.NewProjectResources();
-        public IList<ProjectResource> ResourcesSet
-        {
-                //get { return _resourcesSet; }
-                //set { _resourcesSet = value; }
-
-            get { return Resources as IList<ProjectResource>; }
-            set { Resources.Add(value); }
-        }
-
         
         public override string ToString()
         {
@@ -93,42 +102,6 @@ namespace ProjectTracker.Library
         }
 
         #endregion
-
-
-        //private static PropertyInfo<Tasks> TasksProperty = RegisterProperty<Tasks>(typeof(Project), new PropertyInfo<Tasks>("Tasks", "Tasks"));
-        //public Tasks Tasks
-        //{
-        //    get
-        //    {
-        //        if (!(FieldManager.FieldExists(TasksProperty)))
-        //        {
-        //            SetProperty<Tasks>(TasksProperty, Tasks.NewTasks());
-        //        }
-        //        return GetProperty(TasksProperty);
-        //    }
-        //    set { SetProperty<Tasks>(TasksProperty, value); }
-        //}
-
-        //internal virtual IList<Task> ProjectTasksSet
-        //{
-        //    get { return Tasks as IList<Task>; }
-        //    set
-        //    {
-        //        foreach (Task task in value)
-        //        {
-        //            if (!Tasks.Contains(task))
-        //            {
-        //                task.MarkOld();
-        //                Tasks.Add(task);
-
-        //            }
-        //        }
-        //    }
-        //}
-            
-
-        ////public virtual ISet ProjectTasksSet { get; set; }
-
 
         #region  Validation Rules
 
@@ -160,7 +133,7 @@ namespace ProjectTracker.Library
 
         #endregion
 
-        #region  Authorization Rules
+        #region  Authorization Rules - Commented Out Temporarily
 
         protected override void AddAuthorizationRules()
         {
@@ -182,7 +155,7 @@ namespace ProjectTracker.Library
 
         #endregion
 
-        #region  Factory Methods
+        #region  Factory Methods - No Change
 
         public static Project NewProject()
         {
@@ -204,7 +177,7 @@ namespace ProjectTracker.Library
 
         #endregion
 
-        #region Data Access
+        #region Data Access - Totally Commented Out
 
         //[RunLocal]
         //protected override void DataPortal_Create()
@@ -272,6 +245,8 @@ namespace ProjectTracker.Library
 
         #endregion
 
+        #region Base Overrides / NHibernate Helpers
+
         private NHibernate.ICriteria _iCriteria = null;
 
         public override void SetNHibernateCriteria(object businessCriteria, NHibernate.ICriteria nhibernateCriteria)
@@ -290,6 +265,11 @@ namespace ProjectTracker.Library
             }
         }
 
+        /// <summary>
+        /// Returns the criteria value of a SingleCriteria type for this class
+        /// </summary>
+        /// <param name="businessCriteria"></param>
+        /// <returns></returns>
         public override object GetObjectCriteriaValue(object businessCriteria)
         {
             // Cast the criteria back to the strongly-typed version
@@ -315,16 +295,7 @@ namespace ProjectTracker.Library
             _iCriteria.Add(expression);
         }
 
-        #region Debugging
-
-        public string DumpEditLevels()
-        {
-            var sb = new StringBuilder();
-            sb.AppendFormat("{0} {1}: {2} {3}\r", GetType().Name, GetIdValue(), EditLevel, BindingEdit);
-            Resources.DumpEditLevels(sb);
-            return sb.ToString();
-        }
-
         #endregion
+
     }
 }

@@ -3,19 +3,19 @@ using ProjectTracker.Library.Admin;
 
 namespace ProjectTracker.Library.Mapping
 {
-    //public class RoleMap : PTClassMap<Role>
-    //{
-    //    public RoleMap()
-    //    {
-    //        WithTable("Roles");
+    public class RoleMap : PTClassMap<Role>
+    {
+        public RoleMap()
+        {
+            WithTable("Roles");
 
-    //        Id(x => x.Id)
-    //            .GeneratedBy.Assigned();
+            Id(x => x.Id)
+                .GeneratedBy.Assigned();
 
-    //        Map(x => x.Name)
-    //            .WithLengthOf(50);
-    //    }
-    //}
+            Map(x => x.Name)
+                .WithLengthOf(50);
+        }
+    }
 
     public class RoleSubMap : PTClassMap<RoleNV>
     {

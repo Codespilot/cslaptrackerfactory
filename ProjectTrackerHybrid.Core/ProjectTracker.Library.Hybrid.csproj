@@ -85,15 +85,12 @@
     <Compile Include="Admin\Role.cs" />
     <Compile Include="Admin\Roles.cs" />
     <Compile Include="Admin\User.cs" />
-    <Compile Include="Admin\Users.cs" />
     <Compile Include="Assignment.cs" />
-    <Compile Include="Customer.cs" />
     <Compile Include="Database.cs" />
     <Compile Include="Data\DatabaseKeyAttribute.cs" />
     <Compile Include="Data\IRepository.cs" />
     <Compile Include="Data\Repository.cs" />
     <Compile Include="Data\RepositoryHelper.cs" />
-    <Compile Include="FactoryLoader.cs" />
     <Compile Include="Framework\Factories\AbstractServerBusinessFactory.cs" />
     <Compile Include="Framework\Factories\BusinessListBaseServerFactory.cs" />
     <Compile Include="Framework\Factories\BusinessBaseServerFactory.cs" />
@@ -112,7 +109,6 @@
     <Compile Include="Framework\Factories\ReadOnlyBaseServerFactory.cs" />
     <Compile Include="Framework\Factories\ReadOnlyListServerFactory.cs" />
     <Compile Include="Framework\Factories\UnkownFactoryTypeArgumentException.cs" />
-    <Compile Include="ICustomer.cs" />
     <Compile Include="Mapping\Helpers\GeneratorHelper.cs" />
     <Compile Include="Mapping\Helpers\IMapGenerator.cs" />
     <Compile Include="Mapping\ProjectInfoMap.cs" />
@@ -125,6 +121,7 @@
     <Compile Include="Mapping\RoleMap.cs" />
     <Compile Include="Mapping\UserMap.cs" />
     <Compile Include="Mapping\UserTimeStampType.cs" />
+    <Compile Include="ProjectInfo.cs" />
     <Compile Include="ProjectList.cs" />
     <Compile Include="ProjectResource.cs" />
     <Compile Include="ProjectResources.cs" />
@@ -137,11 +134,6 @@
     <Compile Include="Security\PTIdentity.cs" />
     <Compile Include="Security\PTIdentityRole.cs" />
     <Compile Include="Security\PTPrincipal.cs" />
-    <Compile Include="Task.cs" />
-    <Compile Include="Tasks.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="PTrackerHybrid.cd" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -6,16 +6,19 @@ namespace ProjectTracker.Library
     [Serializable()]
     public class ResourceAssignment : BusinessBase<ResourceAssignment>, IHoldRoles
     {
-        #region Business Methods
 
-        private byte[] _timestamp;
+        #region New/Modified Business Methods
+
         /// <summary>
-        /// Added internal TimeStamp accessor for NHibernate optimistic Concurrency
+        /// This is modified from the Csla Default to be null. This is so
+        /// NHibernate knows what to do with the TimeStamp
         /// </summary>
+        private byte[] timeStamp = null;
+
         internal byte[] TimeStamp
         {
-            get { return _timestamp;}
-            set { _timestamp = value;}
+            get { return timeStamp; }
+            set { timeStamp = value; }
         }
 
         /// <summary>
@@ -31,25 +34,6 @@ namespace ProjectTracker.Library
             set { _project = value; }
         }
 
-        /// <summary>
-        ///  Required for NHibernate mapping so we get a reference to our parent object
-        /// Set can be empty because we do not set our parent from the database.
-        /// </summary>
-        
-        //internal Resource Resource
-        //{
-        //    get;// { ResourceAssignments myParent = Parent as ResourceAssignments;
-        //        //return myParent.Resource;
-        //    //}
-        //    set;// { }
-        //}
-
-        //private static PropertyInfo<Guid> AssignmentIdProperty = RegisterProperty<Guid>(typeof(ResourceAssignment), new PropertyInfo<Guid>("AssignmentId", "Assignment Id"));
-        //internal Guid AssignmentId
-        //{
-        //    get { return GetProperty<Guid>(AssignmentIdProperty); }
-        //    set { SetProperty<Guid>(AssignmentIdProperty, value); }
-        //}
 
         /// <summary>
         /// Added ResourceId Property for NHibernate
@@ -69,30 +53,65 @@ namespace ProjectTracker.Library
             {
                 return Project.Id;
             }
-            internal set { SetProperty(ProjectIdProperty, ref _projectId, value);}
+            internal set { SetProperty(ProjectIdProperty, ref _projectId, value); } // Added internal Set for NHibernate
         }
 
-        private static PropertyInfo<string> ProjectNameProperty = RegisterProperty(new PropertyInfo<string>("ProjectName"));
-        private string _projectName = ProjectNameProperty.DefaultValue;
+        private static PropertyInfo<SmartDate> AssignedProperty = RegisterProperty(new PropertyInfo<SmartDate>("Assigned"));
+        //private SmartDate _assigned = new SmartDate(System.DateTime.Today);
+        public string Assigned
+        {
+            get
+            {
+                return GetPropertyConvert<SmartDate, string>(AssignedProperty);
+            }
+            internal set { SetProperty(AssignedProperty, value); } // Added internal Set for NHibernate
+        }
+
         public string ProjectName
         {
             get
             {
                 return Project.Name;
             }
-            
+
         }
 
-        private static PropertyInfo<SmartDate> AssignedProperty = RegisterProperty(new PropertyInfo<SmartDate>("Assigned"));
-        private SmartDate _assigned = new SmartDate(System.DateTime.Today);
-        public string Assigned
+        #region System.Object overrides -- These are needed for NHibernate mapping and relationships
+
+        public override bool Equals(object obj)
         {
-            get
+            if (obj is ResourceAssignment)
             {
-                return GetPropertyConvert<SmartDate, string>(AssignedProperty, _assigned);
+                ResourceAssignment value = obj as ResourceAssignment;
+
+                if (value.ProjectId == Project.Id)
+                    if (value.ResourceId == ResourceId)
+                        return true;
             }
-            internal set { SetProperty(AssignedProperty, value);}
+            return false;
         }
+
+        public override int GetHashCode()
+        {
+            return _projectId.ToString().GetHashCode(); // + ReadProperty(ResourceIdProperty).ToString()).GetHashCode();
+        }
+
+        #endregion
+
+        #endregion
+
+        #region Business Methods
+
+        // Not needed since we have a reference to the ProjectInfo
+        //private static PropertyInfo<string> ProjectNameProperty = RegisterProperty(new PropertyInfo<string>("ProjectName"));
+        //private string _projectName = ProjectNameProperty.DefaultValue;
+        //public string ProjectName
+        //{
+        //    get
+        //    {
+        //        return GetProperty<string>(ProjectNameProperty, _projectName);
+        //    }
+        //}
 
         private static PropertyInfo<int> RoleProperty = RegisterProperty(new PropertyInfo<int>("Role"));
         private int _role = RoleProperty.DefaultValue;
@@ -119,27 +138,9 @@ namespace ProjectTracker.Library
             return _projectId.ToString();
         }
 
-        public override bool Equals(object obj)
-        {
-            if(obj is ResourceAssignment)
-            {
-                ResourceAssignment value = obj as ResourceAssignment;
-
-                if(value.ProjectId == Project.Id)
-                    if(value.ResourceId == ResourceId)
-                        return true;
-            }
-            return false;
-        }
-
-        public override int GetHashCode()
-        {
-            return _projectId.ToString().GetHashCode(); // + ReadProperty(ResourceIdProperty).ToString()).GetHashCode();
-        }
-
         #endregion
 
-        #region  Validation Rules
+        #region  Validation Rules - No Change
 
         protected override void AddBusinessRules()
         {
@@ -148,7 +149,7 @@ namespace ProjectTracker.Library
 
         #endregion
 
-        #region  Authorization Rules
+        #region  Authorization Rules - Temporarily Commented
 
         protected override void AddAuthorizationRules()
         {
@@ -157,41 +158,44 @@ namespace ProjectTracker.Library
 
         #endregion
 
-
-
         #region  Factory Methods
 
         internal static ResourceAssignment NewResourceAssignment(Guid projectId)
         {
+            // uses a private constructor now because the object factory does not do child objects
             return new ResourceAssignment(projectId, RoleList.DefaultRole());
         }
 
-        internal static ResourceAssignment GetResourceAssignment(string test)
-        {
-            return DataPortal.FetchChild<ResourceAssignment>(test);
-        }
+        // Not Needed
+        //internal static ResourceAssignment GetResourceAssignment(string test)
+        //{
+        //    return DataPortal.FetchChild<ResourceAssignment>(test);
+        //}
 
         private ResourceAssignment()
         {
             /* require use of factory methods */
+            // Have to mark as child since we don't have the dataportal to do it for us
             MarkAsChild();
         }
 
         private ResourceAssignment(Guid projectId, int RoleId)
         {
+            // Have to mark as child since we don't have the dataportal to do it for us
             MarkAsChild();
             var project = Library.Project.GetProject(projectId);
-            _projectName = project.Name;
             _projectId = project.Id;
-            _project = new ProjectInfo(_projectId, _projectName);
-            _assigned = Assignment.GetDefaultAssignedDate();
+            _project = new ProjectInfo(_projectId, project.Name);
+            LoadProperty(AssignedProperty, Assignment.GetDefaultAssignedDate());
             _role = RoleId;
+
+            // Have to Mark New b/c the DataPortal is not involved.
             MarkNew();
         }
 
         #endregion
 
-        #region  Data Access
+        #region  Data Access - Totally Commented
 
         //private void Child_Create(Guid projectId, int role)
         //{

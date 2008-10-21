@@ -117,7 +117,8 @@ namespace ProjectTracker.Library.Tests
 
 
             Project _existingProject = Project.NewProject();
-            _existingProject.Id = Guid.NewGuid();
+            // TODO: FIX THIS LINE OF CODE
+            //_existingProject.Id = Guid.NewGuid();
             _existingProject.Name = "Existing Project";
             using(_mocks.Record())
             {

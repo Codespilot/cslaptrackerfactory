@@ -6,13 +6,7 @@ namespace ProjectTracker.Library
     [Serializable()]
     public class ResourceAssignments : BusinessListBase<ResourceAssignments, ResourceAssignment>
     {
-
-        internal Resource Resource
-        {
-            get { return Parent as Resource; }
-        }
-
-        #region  Business Methods
+        #region  Business Methods - No Change
 
         public ResourceAssignment this[Guid projectId]
         {
@@ -73,24 +67,25 @@ namespace ProjectTracker.Library
 
         #endregion
 
-        #region  Factory Methods
+        #region  Factory Methods - Partailly Commented
 
         internal static ResourceAssignments NewResourceAssignments()
         {
             return DataPortal.CreateChild<ResourceAssignments>();
         }
 
-        internal static ResourceAssignments GetResourceAssignments(string data)
-        {
-            return DataPortal.FetchChild<ResourceAssignments>(data);
-        }
+        // Not Needed
+        //internal static ResourceAssignments GetResourceAssignments(string data)
+        //{
+        //    return DataPortal.FetchChild<ResourceAssignments>(data);
+        //}
 
         private ResourceAssignments()
         { /* require use of factory methods */ }
 
         #endregion
 
-        #region  Data Access
+        #region  Data Access - Totally Commented
 
         //private void Child_Fetch(ProjectTracker.DalLinq.Assignment[] data)
         //{

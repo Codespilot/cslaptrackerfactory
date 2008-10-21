@@ -8,7 +8,6 @@ using Csla.Server;
 using ProjectTracker.Library;
 using ProjectTracker.Library;
 using ProjectTracker.Library.Data;
-using ProjectTracker.Library.Framework;
 using ProjectTracker.Library.Framework.Factories;
 using Rhino.Mocks;
 using StructureMap.Attributes;
@@ -41,10 +40,10 @@ namespace ProjectTracker.Library.Tests.FactoryFixtures
         [TestInitialize]
         public void Fixture_Setup()
         {
-            // brute force attack to set my own factory via reflection
-            var fieldInfo2 = typeof(UnitOfWork).GetField("_unitOfWorkFactory",
-                                BindingFlags.Static | BindingFlags.SetField | BindingFlags.NonPublic);
-            fieldInfo2.SetValue(null, Activator.CreateInstance(typeof(UnitOfWorkFactory), true));
+            /// This is not needed now, I have set all the UnitOfWorkTests to be ignored so we won't have issues with this.
+            //var fieldInfo2 = typeof(UnitOfWork).GetField("_unitOfWorkFactory",
+            //                    BindingFlags.Static | BindingFlags.SetField | BindingFlags.NonPublic);
+            //fieldInfo2.SetValue(null, Activator.CreateInstance(typeof(UnitOfWorkFactory), true));
 
             _repository = _mocks.DynamicMock<IRepository<Product>>();
         }
@@ -138,39 +137,39 @@ namespace ProjectTracker.Library.Tests.FactoryFixtures
                 _factory.Update(product);
             }
         }
-        
-    }
 
-    [DatabaseKey("PTracker")]
-    public class Product : PTBusinessBase<Product>
-    {
-        private static PropertyInfo<string> NameProperty = RegisterProperty<string>(typeof(Product), new PropertyInfo<string>("Name", "Name"));
-        public string Name
+        [TestMethod]
+        public void BusinessBaseFactory_Calls__Repository_Delete()
         {
-            get { return GetProperty<string>(NameProperty); }
-            set { SetProperty<string>(NameProperty, value); }
-        }
+            BusinessBaseServerFactory<Product> _factory = new BusinessBaseServerFactory<Product>(_repository);
 
-        public override object GetObjectCriteriaValue(object businessCriteria)
-        {
-            // Cast the criteria back to the strongly-typed version
-            SingleCriteria<Product, int> criteria = businessCriteria as SingleCriteria<Product, int>;
-
-            // If it's a valid criteria object then check for filters
-            if (!ReferenceEquals(criteria, null))
+            using (_mocks.Record())
             {
-                // Set a reference to the NHibernate ICriteria (for local use only)
-                //_iCriteria = nhibernateCriteria;
-                return criteria.Value;
+                Expect.Call(() => _repository.Delete(null)).IgnoreArguments();
             }
-            return null;
+            using (_mocks.Playback())
+            {
+                Product product = Product.GetOldProduct();
+                _factory.Delete(new SingleCriteria<Product, int>(32));
+            }
         }
 
-        public static Product GetOldProduct()
+        [TestMethod]
+        public void BusinessBaseFactory_Update_DeletedObject_Calls_Delete()
         {
-            Product product = new Product();
-            product.MarkOld();
-            return product;
+            BusinessBaseServerFactory<Product> _factory = new BusinessBaseServerFactory<Product>(_repository);
+
+            using (_mocks.Record())
+            {
+                Expect.Call(() => _repository.Delete(null)).IgnoreArguments();
+            }
+            using (_mocks.Playback())
+            {
+                Product product = Product.GetOldProduct();
+                product.MarkDeleted();
+                _factory.Update(product);
+            }
         }
+        
     }
 }

@@ -10,6 +10,8 @@ using ProjectTracker.Library.Data;
 
 namespace ProjectTracker.Library.Admin
 {
+    //New Class
+    // Note new attributes and signature change of class
     [ObjectFactory("Factory Type=IBusinessBaseServerFactory;Item Type=ProjectTracker.Library.Admin.User, ProjectTracker.Library")]
     [DatabaseKey(Database.PTSecurityDb)]
     [Serializable]
@@ -64,22 +66,6 @@ namespace ProjectTracker.Library.Admin
 
             }
         }
-        #endregion
-
-        #region Validation Rules
-
-        #endregion
-
-        #region Authorization Rules
-
-        #endregion 
-
-        #region Factory Methods
-
-        #endregion
-
-        #region Data Access
-
         #endregion
     }
 }

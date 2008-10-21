@@ -23,6 +23,7 @@ namespace ProjectTracker.Library
             internal set { _id = value; }
         }
 
+        // Added two AutoPropeties for First and Last name mapping from the Database
         internal string FirstName{ get; set;}
         internal string LastName { get; set;}
 
@@ -51,9 +52,11 @@ namespace ProjectTracker.Library
             FirstName = firstName;
             LastName = lastName;
         }
+
+        // Had to add default no arugument constructor for NHibernate
         internal ResourceInfo()
         {
-            
+            /* Require use of Factory Methods */
         }
     }
 }

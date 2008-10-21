@@ -46,6 +46,7 @@ namespace ProjectTracker.Library.Tests
     /// Summary description for UnitOfWork_Fixture
     /// </summary>
     [TestClass]
+    [Ignore]
     public class UnitOfWork_Fixture : FixtureBase
     {
         Rhino.Mocks.MockRepository _mocks = new Rhino.Mocks.MockRepository();

@@ -26,9 +26,9 @@ namespace ProjectTracker.Library
                 throw new NullReferenceException("No roles available; default role can not be returned");
         }
 
-        #endregion
+        #endregion - No Change
 
-        #region  Factory Methods
+        #region  Factory Methods - No Change
 
         private static RoleList _list;
 
@@ -62,7 +62,7 @@ namespace ProjectTracker.Library
 
         #endregion
 
-        #region  Data Access
+        #region  Data Access - Totally Commented
 
         //private void DataPortal_Fetch()
         //{
@@ -79,6 +79,8 @@ namespace ProjectTracker.Library
         //}
 
         #endregion
+
+        #region Base Class overrides / NHibernate Helpers
 
         private NHibernate.ICriteria _iCriteria = null;
 
@@ -111,16 +113,12 @@ namespace ProjectTracker.Library
             _iCriteria.Add(expression);
         }
 
-        #region embedded Role class
-
-        
-
         #endregion
-
     }
 
-    /// <summary>
+        /// <summary>
         /// Represents a <c>Role</c> name-value pair.
+        /// This is a new class for use with NHibernate
         /// </summary>
         [DatabaseKey(Database.PTrackerDb)]
         public class RoleNV : NameValueBase<int, string>
@@ -129,28 +127,16 @@ namespace ProjectTracker.Library
 
             public override NameValueListBase<int,string>.NameValuePair ToNameValuePair()
             {
-                return new NameValueListBase<int,string>.NameValuePair(_id, _name);
+                return new NameValueListBase<int,string>.NameValuePair(Id, Name);
             }
 
             #endregion
 
-            #region fields (in database schema order)
+            #region Properties
 
-            private int _id;
+            public int Id { get; set; }
 
-            public int Id
-            {
-                get { return _id;}
-                set { _id = value;}
-            }
-
-            private string _name;
-
-            public string Name
-            {
-                get { return _name; }
-                set { _name = value; }
-            }
+            public string Name { get; set; }
 
             #endregion
 

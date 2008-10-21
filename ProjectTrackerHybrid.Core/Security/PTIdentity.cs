@@ -14,13 +14,14 @@ namespace ProjectTracker.Library
 {
     namespace Security
     {
+        // Note new Attributes and Class signature
         [ObjectFactory("Factory Type=IReadOnlyBaseServerFactory;Item Type=ProjectTracker.Library.Security.PTIdentity, ProjectTracker.Library")]
         [DatabaseKey(Database.PTSecurityDb)]
         [Serializable()]
         public class PTIdentity : PTReadOnlyBase<PTIdentity>, IIdentity
         {
 
-            #region  Business Methods
+            #region  New/Business Methods
 
             protected override object GetIdValue()
             {
@@ -99,7 +100,7 @@ namespace ProjectTracker.Library
 
             #endregion
 
-            #region  Factory Methods
+            #region  Modified Factory Methods 
 
             internal static PTIdentity UnauthenticatedIdentity()
             {
@@ -133,22 +134,7 @@ namespace ProjectTracker.Library
 
             #endregion
 
-            public override object GetObjectCriteriaValue(object businessCriteria)
-            {
-                // Cast the criteria back to the strongly-typed version
-                CredentialsCriteria criteria = businessCriteria as CredentialsCriteria;
-
-                // If it's a valid criteria object then check for filters
-                if (!ReferenceEquals(criteria, null))
-                {
-                    // Set a reference to the NHibernate ICriteria (for local use only)
-                    //_iCriteria = nhibernateCriteria;
-                    return criteria.Username;
-                }
-                return null;
-            }
-
-            #region  Data Access
+            #region  Data Access - Some Changes
 
             [Serializable()]
             private class CredentialsCriteria
@@ -200,6 +186,7 @@ namespace ProjectTracker.Library
                 }
             }
 
+
             //private void DataPortal_Fetch(CredentialsCriteria criteria)
             //{
             //    using (var ctx = ContextManager<SecurityDataContext>.GetManager(ProjectTracker.DalLinq.Database.Security))
@@ -246,7 +233,30 @@ namespace ProjectTracker.Library
                 }
             }
 
+
             #endregion
+
+            #region Base Overrides / NHibernate Helpers
+
+            public override object GetObjectCriteriaValue(object businessCriteria)
+            {
+                // Cast the criteria back to the strongly-typed version
+                CredentialsCriteria criteria = businessCriteria as CredentialsCriteria;
+
+                // If it's a valid criteria object then check for filters
+                if (!ReferenceEquals(criteria, null))
+                {
+                    // Set a reference to the NHibernate ICriteria (for local use only)
+                    //_iCriteria = nhibernateCriteria;
+                    return criteria.Username;
+                }
+                return null;
+            }
+
+            #endregion
+
+
+            
 
         }
     }

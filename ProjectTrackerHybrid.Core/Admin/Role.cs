@@ -3,9 +3,12 @@ using Csla.Data;
 using System;
 using ProjectTracker.Library.Data;
 using ProjectTracker.Library.Framework;
+using CslaFactory = Csla.Server.ObjectFactoryAttribute;
 
 namespace ProjectTracker.Library.Admin
 {
+    // Note new attributes and signature change of class
+    [CslaFactory("Factory Type=IBusinessBaseServerFactory;Item Type=ProjectTracker.Library.Admin.Role, ProjectTracker.Library")]
     [DatabaseKey(Database.PTrackerDb)]
     [Serializable()]
     public class Role : PTBusinessBase<Role>
@@ -27,7 +30,7 @@ namespace ProjectTracker.Library.Admin
             }
             set
             {
-                //_idSet = true;
+                _idSet = true;
                 SetProperty<int>(IdProperty, value);
             }
         }
@@ -95,7 +98,7 @@ namespace ProjectTracker.Library.Admin
 
         #endregion
 
-        #region  Authorization Rules
+        #region  Authorization Rules - Commented Out Temporarily
 
         protected override void AddAuthorizationRules()
         {
@@ -105,24 +108,30 @@ namespace ProjectTracker.Library.Admin
 
         #endregion
 
-        #region  Factory Methods
+        #region  Factory Methods - Partially Commented
 
         internal static Role NewRole()
         {
             return DataPortal.CreateChild<Role>();
         }
 
-        internal static Role GetRole(string data)
-        {
-            return DataPortal.FetchChild<Role>(data);
-        }
+        //internal static Role GetRole(string rolename)
+        //{
+        //    return DataPortal.FetchChild<Role>(rolename);
+        //}
+        
 
+      
         private Role()
-        { /* require use of factory methods */ }
+        {
+            /* require use of factory methods */
+            MarkAsChild();
+            
+        }
 
         #endregion
 
-        #region  Data Access
+        #region  Data Access - Totally Commented Out
 
         //private void Child_Fetch(ProjectTracker.DalLinq.getRolesResult data)
         //{

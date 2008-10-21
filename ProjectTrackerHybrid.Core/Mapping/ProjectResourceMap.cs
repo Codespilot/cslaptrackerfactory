@@ -24,7 +24,7 @@ namespace ProjectTracker.Library.Mapping
             Map(x => x.Assigned);
             Map(x => x.Role);
 
-            References(x => x.Resource).TheColumnNameIs("ResourceId"); //.SetAttribute("update", "false"); ;
+            References(x => x.Resource).TheColumnNameIs("ResourceId");//.SetAttribute("update", "false");
 
             Version(x => x.TimeStamp)
                 .TheColumnNameIs("LastChanged");
