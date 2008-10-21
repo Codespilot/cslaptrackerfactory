@@ -4,8 +4,11 @@ using System.Reflection;
 using NHibernate;
 using Rhino.Mocks;
 
+
 #if !NUNIT
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using StructureMap;
+
 #else
 using NUnit.Framework;
 using TestClass = NUnit.Framework.TestFixtureAttribute;
@@ -162,10 +165,9 @@ namespace ProjectTracker.Library.Tests
     /// Summary description for UnitOfWork_With_Factory_Fixture
     /// </summary>
     [TestClass]
-    [Ignore]
     public class UnitOfWork_With_Factory_Fixture : FixtureBase
     {
-        private string dbKey = "PTracker";
+        private string dbKey = "TEST";
 
         public UnitOfWork_With_Factory_Fixture()
         {
@@ -201,7 +203,7 @@ namespace ProjectTracker.Library.Tests
         private IUnitOfWork _unitOfWork;
         private ISession _session;
 
-
+        
 
         [TestInitialize]
         public void SetUpContext()
@@ -232,33 +234,32 @@ namespace ProjectTracker.Library.Tests
 
             ResetUnitOfWork();
             ////assert that the UnitOfWork is reset
-            var fieldInfo = typeof(UnitOfWork).GetField("_unitOfWorkFactory",
-                BindingFlags.Static | BindingFlags.SetField | BindingFlags.NonPublic);
-            fieldInfo.SetValue(null, null);
+            //ObjectFactory.Inject<IUnitOfWorkFactory>(null);
 
             _mocks.BackToRecordAll();
 
             // brute force attack to set my own factory via reflection
-            var fieldInfo2 = typeof(UnitOfWork).GetField("_unitOfWorkFactory",
-                                BindingFlags.Static | BindingFlags.SetField | BindingFlags.NonPublic);
-            fieldInfo2.SetValue(null, Activator.CreateInstance(typeof(UnitOfWorkFactory), true));
+            //var fieldInfo2 = typeof(UnitOfWork).GetField("_unitOfWorkFactory",
+            //                    BindingFlags.Static | BindingFlags.SetField | BindingFlags.NonPublic);
+            //fieldInfo2.SetValue(null, Activator.CreateInstance(typeof(UnitOfWorkFactory), true));
         }
 
         private static void ResetUnitOfWork()
         {
             // assert that the UnitOfWork is reset
-            var propertyInfo = typeof(UnitOfWork).GetProperty("CurrentUnitOfWork",
-                                BindingFlags.Static | BindingFlags.SetProperty | BindingFlags.NonPublic);
+            var propertyInfo = typeof(UnitOfWork).GetProperty("Current",
+                                BindingFlags.Static | BindingFlags.SetProperty | BindingFlags.Public);
             propertyInfo.SetValue(null, null, null);
 
         }
 
         private void InstrumentUnitOfWork()
         {
-            // brute force attack to set my own factory via reflection
-            var fieldInfo = typeof(UnitOfWork).GetField("_unitOfWorkFactory",
-                                BindingFlags.Static | BindingFlags.SetField | BindingFlags.NonPublic);
-            fieldInfo.SetValue(null, _factory);
+            //// brute force attack to set my own factory via reflection
+            //var fieldInfo = typeof(UnitOfWork).GetField("_unitOfWorkFactory",
+            //                    BindingFlags.Static | BindingFlags.SetField | BindingFlags.NonPublic);
+            //fieldInfo.SetValue(null, _factory);
+            ObjectFactory.Inject<IUnitOfWorkFactory>(_factory);
         }
 
         [TestMethod]
@@ -284,7 +285,9 @@ namespace ProjectTracker.Library.Tests
             var current = UnitOfWork.Current;
         }
 
+        
         [TestMethod]
+        [Ignore]
         [ExpectedException(typeof(InvalidOperationException))]
         public void Starting_UnitOfWork_if_already_started_throws()
         {

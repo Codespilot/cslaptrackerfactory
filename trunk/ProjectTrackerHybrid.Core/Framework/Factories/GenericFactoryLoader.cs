@@ -83,8 +83,8 @@ namespace ProjectTracker.Library.Framework.Factories
                 throw new InvalidOperationException(
                     string.Format("Factory Type Not Found: {0}", factoryName));
 
-            if (factoryType.IsGenericType)
-            {
+            //if (factoryType.IsGenericType)
+            //{
                 if (factoryType.GetGenericTypeDefinition() == typeof (IReadOnlyListServerFactory<,>))
                 {
                     var generic = typeof (IReadOnlyListServerFactory<,>);
@@ -116,42 +116,42 @@ namespace ProjectTracker.Library.Framework.Factories
                     Type[] typeArgs = {Type.GetType(parser.ItemType)};
                     return StructureMap.ObjectFactory.GetInstance(generic.MakeGenericType(typeArgs));
                 }
-            }
-            else
-            {
-                // This piece of code is used for unit testing, until we find a better way.
-                if (factoryType.Name.Contains("IReadOnlyListServerFactory"))
-                {
-                    var generic = typeof(IReadOnlyListServerFactory<,>);
-                    Type[] typeArgs = { Type.GetType(parser.ListType), Type.GetType(parser.ItemType) };
-                    return StructureMap.ObjectFactory.GetInstance(generic.MakeGenericType(typeArgs));
-                }
-                else if (factoryType.Name.Contains("IBusinessBaseServerFactory"))
-                {
-                    var generic = typeof(IBusinessBaseServerFactory<>);
-                    Type[] typeArgs = { Type.GetType(parser.ItemType) };
-                    return StructureMap.ObjectFactory.GetInstance(generic.MakeGenericType(typeArgs));
-                }
-                else if (factoryType.Name.Contains("INameValueListServerFactory"))
-                {
-                    var generic = typeof(INameValueListServerFactory<,,,>);
-                    Type[] typeArgs = { Type.GetType(parser.ListType), Type.GetType(parser.KeyType), Type.GetType(parser.ValueType), Type.GetType(parser.ItemType) };
-                    return StructureMap.ObjectFactory.GetInstance(generic.MakeGenericType(typeArgs));
-                }
-                else if (factoryType.Name.Contains("IBusinessListBaseServerFactory"))
-                {
-                    var generic = typeof(IBusinessListBaseServerFactory<,>);
-                    Type[] typeArgs = { Type.GetType(parser.ListType), Type.GetType(parser.ItemType) };
-                    return StructureMap.ObjectFactory.GetInstance(generic.MakeGenericType(typeArgs));
-                }
-                else if (factoryType.Name.Contains("IReadOnlyBaseServerFactory"))
-                {
-                    var generic = typeof(IReadOnlyBaseServerFactory<>);
-                    Type[] typeArgs = { Type.GetType(parser.ItemType) };
-                    return StructureMap.ObjectFactory.GetInstance(generic.MakeGenericType(typeArgs));
-                }
-            }
-            throw new NotImplementedException();
+            //}
+            //else
+            //{
+                //// This piece of code is used for unit testing, until we find a better way.
+                //if (factoryType.Name.Contains("IReadOnlyListServerFactory"))
+                //{
+                //    var generic = typeof(IReadOnlyListServerFactory<,>);
+                //    Type[] typeArgs = { Type.GetType(parser.ListType), Type.GetType(parser.ItemType) };
+                //    return StructureMap.ObjectFactory.GetInstance(generic.MakeGenericType(typeArgs));
+                //}
+                //else if (factoryType.Name.Contains("IBusinessBaseServerFactory"))
+                //{
+                //    var generic = typeof(IBusinessBaseServerFactory<>);
+                //    Type[] typeArgs = { Type.GetType(parser.ItemType) };
+                //    return StructureMap.ObjectFactory.GetInstance(generic.MakeGenericType(typeArgs));
+                //}
+                //else if (factoryType.Name.Contains("INameValueListServerFactory"))
+                //{
+                //    var generic = typeof(INameValueListServerFactory<,,,>);
+                //    Type[] typeArgs = { Type.GetType(parser.ListType), Type.GetType(parser.KeyType), Type.GetType(parser.ValueType), Type.GetType(parser.ItemType) };
+                //    return StructureMap.ObjectFactory.GetInstance(generic.MakeGenericType(typeArgs));
+                //}
+                //else if (factoryType.Name.Contains("IBusinessListBaseServerFactory"))
+                //{
+                //    var generic = typeof(IBusinessListBaseServerFactory<,>);
+                //    Type[] typeArgs = { Type.GetType(parser.ListType), Type.GetType(parser.ItemType) };
+                //    return StructureMap.ObjectFactory.GetInstance(generic.MakeGenericType(typeArgs));
+                //}
+                //else if (factoryType.Name.Contains("IReadOnlyBaseServerFactory"))
+                //{
+                //    var generic = typeof(IReadOnlyBaseServerFactory<>);
+                //    Type[] typeArgs = { Type.GetType(parser.ItemType) };
+                //    return StructureMap.ObjectFactory.GetInstance(generic.MakeGenericType(typeArgs));
+                //}
+            //}
+            throw new UnkownFactoryTypeArgumentException();
 
         }
     }

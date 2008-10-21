@@ -18,6 +18,7 @@ namespace ProjectTracker.Library.Framework.Factories
 
         private string DatabaseKey { get { return DatabaseKeyAttribute.GetDatabaseKeyForClass(typeof(T)); } }
 
+
         public BusinessBaseServerFactory(IRepository<T> repository)
         {
             _repository = repository;
@@ -70,54 +71,6 @@ namespace ProjectTracker.Library.Framework.Factories
         {
             if (obj.IsDeleted)
             {
-                if (UnitOfWork.IsStarted)
-                    _repository.Delete(obj);
-                else
-                {
-                    using (UnitOfWork.Start(DatabaseKey))
-                    {
-                        _repository.Delete(obj);
-                        UnitOfWork.Current.TransactionalFlush();
-                        UnitOfWork.CurrentSession(DatabaseKey).Clear();
-                    }
-                }
-            }
-            else
-            {
-                if (UnitOfWork.IsStarted)
-                {
-                    if(obj.IsNew)
-                        _repository.Save(obj);
-                    else
-                        _repository.SaveOrUpdate(obj);
-                }
-                else
-                {
-                    using (UnitOfWork.Start(DatabaseKey))
-                    {
-                        if (obj.IsNew)
-                            _repository.Save(obj);
-                        else
-                            _repository.Update(obj);
-
-                        UnitOfWork.Current.TransactionalFlush();
-                        UnitOfWork.CurrentSession(DatabaseKey).Clear();
-                    }
-                }
-            }
-         
-            MarkOld(obj);
-            return obj;
-        }
-        public void Delete(CriteriaBase criteria)
-        {
-            var obj = (T) Fetch(criteria);
-            if (UnitOfWork.IsStarted)
-            {
-                _repository.Delete(obj);
-            }
-            else
-            {
                 using (UnitOfWork.Start(DatabaseKey))
                 {
                     _repository.Delete(obj);
@@ -125,10 +78,47 @@ namespace ProjectTracker.Library.Framework.Factories
                     UnitOfWork.CurrentSession(DatabaseKey).Clear();
                 }
             }
+            else
+            {
+                //if (UnitOfWork.IsStarted)
+                //{
+                //    if(obj.IsNew)
+                //        _repository.Save(obj);
+                //    else
+                //        _repository.SaveOrUpdate(obj);
+                //}
+                //else
+                //{
+                using (UnitOfWork.Start(DatabaseKey))
+                {
+                    if (obj.IsNew)
+                        _repository.Save(obj);
+                    else
+                        _repository.Update(obj);
 
-         
+                    UnitOfWork.Current.TransactionalFlush();
+                    UnitOfWork.CurrentSession(DatabaseKey).Clear();
+                }
+                //}
+            }
+
+            MarkOld(obj);
+            return obj;
+        }
+        public void Delete(CriteriaBase criteria)
+        {
+            var obj = (T) Fetch(criteria);
+            Delete(obj);
         }
 
-      
+        public void Delete(T obj)
+        {
+            using (UnitOfWork.Start(DatabaseKey))
+            {
+                _repository.Delete(obj);
+                UnitOfWork.Current.TransactionalFlush();
+                UnitOfWork.CurrentSession(DatabaseKey).Clear();
+            }
+        }
     }
 }

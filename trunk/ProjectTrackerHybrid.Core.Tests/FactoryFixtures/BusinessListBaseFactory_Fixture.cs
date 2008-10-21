@@ -1,26 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using Csla;
-using Csla.Server;
+﻿using Csla;
 using NHibernate.Criterion;
-using ProjectTracker.Library;
-using ProjectTracker.Library;
 using ProjectTracker.Library.Data;
-using ProjectTracker.Library.Framework;
 using ProjectTracker.Library.Framework.Factories;
 using Rhino.Mocks;
-using StructureMap.Attributes;
-using StructureMap.Configuration;
-using StructureMap.Configuration.DSL;
-using StructureMap.Graph;
-using StructureMap.Pipeline;
-using StructureMap;
 #if !NUNIT
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using ObjectFactory = StructureMap.ObjectFactory;
 
 #else
 using NUnit.Framework;
@@ -36,264 +20,144 @@ namespace ProjectTracker.Library.Tests.FactoryFixtures
     [TestClass]
     public class BusinessListBaseFactory_Fixture : FixtureBase
     {
-        MockRepository _mocks = new MockRepository();
         IRepository<Product> _repository;
+        NHibernate.ICriteria _criteria;
+        private BusinessListBaseServerFactory<ProductList, Product> _factory;
+        
 
         [TestInitialize]
-        public void Fixture_Setup()
+        public void Test_Setup()
         {
-            /// This is not needed now, I have set all the UnitOfWorkTests to be ignored so we won't have issues with this.
-            //var fieldInfo2 = typeof(UnitOfWork).GetField("_unitOfWorkFactory",
-            //                    BindingFlags.Static | BindingFlags.SetField | BindingFlags.NonPublic);
-            //fieldInfo2.SetValue(null, Activator.CreateInstance(typeof(UnitOfWorkFactory), true));
+            SetupTest();
+            _repository = MockRepository.GenerateStub<IRepository<Product>>(); //_mocks.DynamicMock<IRepository<Product>>();
+            _factory = new BusinessListBaseServerFactory<ProductList, Product>(_repository);
+        }
 
-            _repository = _mocks.DynamicMock<IRepository<Product>>();
+        [TestCleanup]
+        public void Cleanup()
+        {
+            base.CleanupTest();
+
         }
 
         [TestMethod]
         public void BusinessListBaseFactory_Can_Create_Factory()
         {
-            BusinessListBaseServerFactory<ProductList, Product> _factory = new BusinessListBaseServerFactory<ProductList, Product>(_repository);
+            BusinessListBaseServerFactory<ProductList, Product> factory = new BusinessListBaseServerFactory<ProductList, Product>(_repository);
 
-            Assert.IsNotNull(_factory);
+            Assert.IsNotNull(factory);
         }
 
         [TestMethod]
         public void BusinessListBaseFactory_Can_Create_Object()
         {
-            BusinessListBaseServerFactory<ProductList, Product> _factory = new BusinessListBaseServerFactory<ProductList, Product>(_repository);
-
             ProductList products = _factory.Create();
 
             Assert.IsNotNull(products);
         }
 
         [TestMethod]
-        public void BusinessBaseFactory_Fetch_No_Criteria()
+        public void BusinessListBaseFactory_Fetch_No_Criteria()
         {
-            BusinessListBaseServerFactory<ProductList, Product> _factory = new BusinessListBaseServerFactory<ProductList, Product>(_repository);
-
             ProductList list = new ProductList();
             list.Add(new Product() { Name = "Test" });
             list.Add(new Product() { Name = "Test1" });
             list.Add(new Product() { Name = "Test2" });
 
             ProductList products = _factory.Create();
-            using (_mocks.Record())
-            {
-                Expect.Call(_repository.FindAll(DetachedCriteria.For(typeof(Product)))).IgnoreArguments().Return(list);
-            }
-            using (_mocks.Playback())
-            {
-                products = _factory.Fetch();
-            }
+            
+            _repository.Expect(x => x.FindAll(DetachedCriteria.For(typeof (Product)))).IgnoreArguments().Return(list);
+            _repository.Replay();
+
+            products = _factory.Fetch();
+            
+            _repository.AssertWasCalled(x => x.FindAll(DetachedCriteria.For(typeof(Product))), r => r.IgnoreArguments());
             Assert.AreEqual(3, products.Count);
         }
 
         [TestMethod]
-        public void BusinessBaseFactory_Fetch_WithCriteria_ReturnsObject()
+        public void BusinessListBaseFactory_Fetch_WithCriteria_ReturnsObject()
         {
-            BusinessListBaseServerFactory<ProductList, Product> _factory = new BusinessListBaseServerFactory<ProductList, Product>(_repository);
-            _criteria = _mocks.DynamicMock<NHibernate.ICriteria>();
+            _criteria = MockRepository.GenerateStub<NHibernate.ICriteria>();
 
             ProductList list = new ProductList();
             list.Add(new Product() { Name = "Test" });
             list.Add(new Product() { Name = "Test1" });
             list.Add(new Product() { Name = "Test2" });
-            
+
             NHibernate.Criterion.SimpleExpression expression = Restrictions.Eq("Name", "Test");
-            SetupResult.For(_criteria.Add(expression)).Return(_criteria);
+            _criteria.Expect(c => c.Add(expression)).Return(_criteria);
+            _repository.Expect(r => r.CreateCriteria()).Return(_criteria);
+            _criteria.Expect(c => c.List<Product>()).Return(list);
 
-            ProductList _returnValues = new ProductList();
-            ProductList products = _factory.Create();
-            using (_mocks.Record())
-            {
-                Expect.Call(_repository.CreateCriteria()).Return(_criteria);//.Do(getCriteria());
-                Expect.Call(_criteria.List <Product>()).Return(list);
-            }
-            using (_mocks.Playback())
-            {
-                products = _factory.Fetch(new SingleCriteria<ProductList, string>("Test"));
-            }
-
+            ProductList products = _factory.Fetch(new SingleCriteria<ProductList, string>("Test"));
+            
+            _repository.AssertWasCalled(r => r.CreateCriteria());
+            _criteria.AssertWasCalled(c => c.List<Product>());
             Assert.AreEqual(3, products.Count);
         }
 
         [TestMethod]
         public void BusinessListBaseFactory_Fetch_Null_Criteria_ReturnsList()
         {
-            BusinessListBaseServerFactory<ProductList, Product> _factory = new BusinessListBaseServerFactory<ProductList, Product>(_repository);
-
             ProductList list = new ProductList();
             list.Add(new Product() { Name = "Test" });
             list.Add(new Product() { Name = "Test1" });
             list.Add(new Product() { Name = "Test2" });
 
             ProductList products = _factory.Create();
-            using (_mocks.Record())
-            {
-                Expect.Call(_repository.FindAll(DetachedCriteria.For(typeof(Product)))).IgnoreArguments().Return(list);
-            }
-            using (_mocks.Playback())
-            {
-                products = _factory.Fetch(null);
-            }
+
+            _repository.Expect(x => x.FindAll(DetachedCriteria.For(typeof(Product)))).IgnoreArguments().Return(list);
+            _repository.Replay();
+
+            products = _factory.Fetch(null);
+
+            _repository.AssertWasCalled(x => x.FindAll(DetachedCriteria.For(typeof(Product))), r => r.IgnoreArguments());
             Assert.AreEqual(3, products.Count);
         }
 
         [TestMethod]
         public void BusinessListBaaseFactory_Save_New_items()
         {
-            BusinessListBaseServerFactory<ProductList, Product> _factory = new BusinessListBaseServerFactory<ProductList, Product>(_repository);
-
             ProductList list = new ProductList();
             list.Add(new Product() { Name = "Test" });
             list.Add(new Product() { Name = "Test1" });
             list.Add(new Product() { Name = "Test2" });
 
-            Product product = new Product() { Name = "Saved Project" };
+            ProductList products = _factory.Create();
 
-            using (_mocks.Record())
-            {
-                Expect.Call(_repository.Save(null)).IgnoreArguments().Return(product);
-            }
-            using (_mocks.Playback())
-            {
-                _factory.Update(list);
-            }
+            products = _factory.Update(list);
 
+            _repository.AssertWasCalled(x => x.Save(null), r => r.IgnoreArguments().Repeat.Times(3));
+            unitOfWorkStub.AssertWasCalled(x => x.TransactionalFlush());
         }
 
         [TestMethod]
         public void BusinessListBaseFactory_Update_Existing_items()
         {
-            BusinessListBaseServerFactory<ProductList, Product> _factory = new BusinessListBaseServerFactory<ProductList, Product>(_repository);
-
             ProductList list = ProductList.GetOldProducts();
 
             Product product = new Product() { Name = "Saved Project" };
 
-            using (_mocks.Record())
-            {
-                Expect.Call(_repository.SaveOrUpdate(null)).IgnoreArguments().Return(product);
-            }
-            using (_mocks.Playback())
-            {
-                _factory.Update(list);
-            }
+            _repository.Expect(r => r.SaveOrUpdate(null)).IgnoreArguments().Return(product);
+            _factory.Update(list);
+
+            // Only one item in the list should be dirty
+            _repository.AssertWasCalled(x => x.SaveOrUpdate(null), r => r.IgnoreArguments().Repeat.Times(1));
+            unitOfWorkStub.AssertWasCalled(x => x.TransactionalFlush());
         }
 
         [TestMethod]
         public void BusinessListBase_Update_Delete_removed_Items()
         {
-            BusinessListBaseServerFactory<ProductList, Product> _factory = new BusinessListBaseServerFactory<ProductList, Product>(_repository);
-
             ProductList list = ProductList.GetOldProducts();
-
-            Product productToRemove = list[2];
 
             list.Remove("Updated Project");
 
-            Product product = new Product() { Name = "Saved Project" };
+            _factory.Update(list);
 
-            using (_mocks.Record())
-            {
-                Expect.Call(() =>_repository.Delete(null)).IgnoreArguments();
-            }
-            using (_mocks.Playback())
-            {
-                _factory.Update(list);
-            }
-        }
-
-        
-        //delegate NHibernate.ICriteria CriteriaAction();
-
-        //private CriteriaAction getCriteria()
-        //{
-        //    return delegate()
-        //    {
-        //        return _criteria;
-        //    };
-            
-        //}
-
-        //private delegate IList<Product> GetList();
-        //private IList<Product> GetCriteriaList()
-        //{
-        //    return new ProductList();
-        //}
-
-        private NHibernate.ICriteria _criteria = null;
-    }
-
-    public class ProductList : PTBusinessListBase<ProductList, Product>
-    {
-        private NHibernate.ICriteria _iCriteria = null;
-
-        public override void SetNHibernateCriteria(object businessCriteria, NHibernate.ICriteria nhibernateCriteria)
-        {
-            // Cast the criteria back to the strongly-typed version
-            SingleCriteria<ProductList, string> criteria = businessCriteria as SingleCriteria<ProductList, string>;
-
-            // If it's a valid criteria object then check for filters
-            if (!ReferenceEquals(criteria, null))
-            {
-                // Set a reference to the NHibernate ICriteria (for local use only)
-                _iCriteria = nhibernateCriteria;
-
-                // Name
-                if (!String.IsNullOrEmpty(criteria.Value))
-                {
-                    AddCriterionName(criteria.Value);
-                }
-            }
-        }
-
-        /// <summary>
-        /// Adds a criterion to the NHibernate <see cref="ICriteria"/> that filters by name.
-        /// </summary>
-        /// <param name="name">The name to use as a filter.</param>
-        private void AddCriterionName(string name)
-        {
-            NHibernate.Criterion.SimpleExpression expression = Restrictions.Eq("Name", name);
-            _iCriteria.Add(expression);
-        }
-
-
-        public static ProductList GetOldProducts()
-        {
-            ProductList _list = new ProductList();
-
-            for (int i = 0; i < 4; i++)
-            {
-                Product prod1 = new Product();
-                prod1.Name = "Test" + i.ToString();
-                prod1.MarkAsChild();
-                prod1.MarkOld();
-                
-
-
-                if (i == 2)
-                    prod1.Name = "Updated Project";
-
-                _list.Add(prod1);
-
-            }
-
-            return _list;
-        }
-
-        public void Remove(string name)
-        {
-            foreach (Product prod in this)
-            {
-                if (prod.Name.Equals(name))
-                {
-                    Remove(prod);
-                    break;
-                }
-            }
+            _repository.AssertWasCalled(x => x.Delete(null), r => r.IgnoreArguments().Repeat.Times(1));
+            unitOfWorkStub.AssertWasCalled(x => x.TransactionalFlush());
         }
     }
 }

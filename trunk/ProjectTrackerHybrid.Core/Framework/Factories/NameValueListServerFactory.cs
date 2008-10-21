@@ -41,20 +41,15 @@ namespace ProjectTracker.Library.Framework.Factories
             return obj;
         }
 
-        public T Fetch() 
+        public T Fetch()
         {
             var list = (T) Activator.CreateInstance(typeof (T), true);
 
             IList<I> _list;
 
-            if (UnitOfWork.IsStarted)
-                _list = _repository.FindAll(DetachedCriteria.For(typeof (I)));
-            else
+            using (UnitOfWork.Start(DatabaseKey))
             {
-                using (UnitOfWork.Start(DatabaseKey))
-                {
-                    _list = _repository.FindAll(DetachedCriteria.For(typeof (I)));
-                }
+                _list = _repository.FindAll(DetachedCriteria.For(typeof (I)));
             }
 
             list.IsReadOnly = false;

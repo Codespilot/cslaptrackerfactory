@@ -38,8 +38,9 @@ namespace ProjectTracker.Library.Framework.Factories
 
         public override T Fetch()
         {
-            throw new InvalidOperationException("You must provide criteria to load an object");
+            throw new NotImplementedException("You must pass critiria to load a Root Object");
         }
+
 
         public override T Fetch(CriteriaBase criteria)
         {

@@ -53,13 +53,15 @@ namespace ProjectTracker.Library.Framework.Factories
         public override L Fetch()
         {
             L list = (L)Activator.CreateInstance(typeof(L), true);
-            
-
             list.RaiseListChangedEvents = false;
+
+            IList<I> _list;
 
             using (UnitOfWork.Start(DatabaseKey))
             {
-                IList<I> _list = _repository.FindAll(DetachedCriteria.For(typeof (I)));
+               _list = _repository.FindAll(DetachedCriteria.For(typeof (I)));
+            
+            }
                 list.IsReadOnly = false;
                 foreach (I item in _list)
                 {
@@ -67,7 +69,7 @@ namespace ProjectTracker.Library.Framework.Factories
                     list.Add(item);
                 }
                 list.IsReadOnly = true;
-            }
+            
             MarkOld(list);
             list.RaiseListChangedEvents = true;
             
@@ -90,12 +92,12 @@ namespace ProjectTracker.Library.Framework.Factories
                 }
 
                 list.RaiseListChangedEvents = false;
-
+                list.IsReadOnly = false;
                 foreach (var item in _list)
                 {
                     list.Add(item);
                 }
-
+                list.IsReadOnly = true;
                 list.RaiseListChangedEvents = true;
                 MarkOld(list);
                 return list;

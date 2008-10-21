@@ -4,7 +4,7 @@ using ProjectTracker.Library.Framework;
 
 namespace ProjectTracker.Library.Tests.FactoryFixtures
 {
-    [DatabaseKey("PTracker")]
+    [DatabaseKey("TEST")]
     public class Product : PTBusinessBase<Product>
     {
         private static PropertyInfo<string> NameProperty = RegisterProperty<string>(typeof(Product), new PropertyInfo<string>("Name", "Name"));

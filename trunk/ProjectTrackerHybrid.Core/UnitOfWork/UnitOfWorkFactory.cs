@@ -15,7 +15,8 @@ namespace ProjectTracker.Library
         private static Dictionary<string, ISession> _sessions = new Dictionary<string, ISession>();
         private Dictionary<string, ISessionFactory> _sessionFactories = new Dictionary<string, ISessionFactory>();
         private Dictionary<string, Configuration> _configurations = new Dictionary<string, Configuration>();
-        internal UnitOfWorkFactory()
+        
+        public UnitOfWorkFactory()
         { }
 
         public IUnitOfWork Create(string dbKey)

@@ -13,14 +13,14 @@ namespace ProjectTracker.Library.Mapping
 {
     public abstract class PTClassMap<T> : ClassMap<T>
     {
-
         /// <summary>
         /// This overloaded version is required so that we can use optimistic concurrency with a sql timestamp in the database.
         /// </summary>
         /// <param name="expression"></param>
         /// <returns></returns>
-        public override VersionPart Version(System.Linq.Expressions.Expression<Func<T, object>> expression)
+        public override VersionPart Version(Expression<System.Func<T, object>> expression)
         {
+            
             var versionPart = new VersionPart(ReflectionHelper.GetProperty(expression));
 
             versionPart.SetAttribute("type", "ProjectTracker.Library.Mapping.UserTypeTimestamp, ProjectTracker.Library");

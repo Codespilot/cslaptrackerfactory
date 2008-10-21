@@ -134,6 +134,8 @@
     <Compile Include="Security\PTIdentity.cs" />
     <Compile Include="Security\PTIdentityRole.cs" />
     <Compile Include="Security\PTPrincipal.cs" />
+    <Compile Include="UnitOfWork\DisposableAction.cs" />
+    <Compile Include="UnitOfWork\Proc.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

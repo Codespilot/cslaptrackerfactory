@@ -1,24 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Text;
 using Csla;
-using Csla.Server;
-using ProjectTracker.Library;
-using ProjectTracker.Library;
 using ProjectTracker.Library.Data;
 using ProjectTracker.Library.Framework.Factories;
 using Rhino.Mocks;
-using StructureMap.Attributes;
-using StructureMap.Configuration;
-using StructureMap.Configuration.DSL;
-using StructureMap.Graph;
-using StructureMap.Pipeline;
-using StructureMap;
 #if !NUNIT
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using ObjectFactory = StructureMap.ObjectFactory;
 
 #else
 using NUnit.Framework;
@@ -34,18 +20,20 @@ namespace ProjectTracker.Library.Tests.FactoryFixtures
     [TestClass]
     public class BusinessBaseFactoryFixture : FixtureBase
     {
-        MockRepository _mocks = new MockRepository();
         IRepository<Product> _repository;
 
         [TestInitialize]
-        public void Fixture_Setup()
+        public void Setup()
         {
-            /// This is not needed now, I have set all the UnitOfWorkTests to be ignored so we won't have issues with this.
-            //var fieldInfo2 = typeof(UnitOfWork).GetField("_unitOfWorkFactory",
-            //                    BindingFlags.Static | BindingFlags.SetField | BindingFlags.NonPublic);
-            //fieldInfo2.SetValue(null, Activator.CreateInstance(typeof(UnitOfWorkFactory), true));
+            SetupTest();
 
-            _repository = _mocks.DynamicMock<IRepository<Product>>();
+            _repository = MockRepository.GenerateStub<IRepository<Product>>();
+        }
+
+        [TestCleanup]
+        public void TearDown()
+        {
+            disposeGlobalUnitOfWorkRegistration.Dispose();
         }
 
 
@@ -81,14 +69,9 @@ namespace ProjectTracker.Library.Tests.FactoryFixtures
             BusinessBaseServerFactory<Product> _factory = new BusinessBaseServerFactory<Product>(_repository);
 
             Product product = _factory.Create();
-            using(_mocks.Record())
-            {
-                Expect.Call(() => _repository.Load(product, 32)).IgnoreArguments();
-            }
-            using(_mocks.Playback())
-            {
-                product = _factory.Fetch(new SingleCriteria<Product, int>(32));
-            }
+            product = _factory.Fetch(new SingleCriteria<Product, int>(32));
+
+            _repository.AssertWasCalled(x => x.Load(product, 32));
         }
 
         [TestMethod]
@@ -106,20 +89,12 @@ namespace ProjectTracker.Library.Tests.FactoryFixtures
         {
             BusinessBaseServerFactory<Product> _factory = new BusinessBaseServerFactory<Product>(_repository);
 
-            Product expected = new Product();
-            expected.Name = "Product XYZ";
-
             Product product = _factory.Create();
+            product.Name = "Test 123";
+            _factory.Update(product);
 
-            using(_mocks.Record())
-            {
-                Expect.Call(_repository.Save(null)).Return(expected).IgnoreArguments();
-            }
-            using(_mocks.Playback())
-            {
-                product.Name = "Test 123";
-                _factory.Update(product);
-            }
+            _repository.AssertWasCalled(x => x.Save(product));
+            unitOfWorkStub.AssertWasCalled(x => x.TransactionalFlush());
         }
 
         [TestMethod]
@@ -127,31 +102,36 @@ namespace ProjectTracker.Library.Tests.FactoryFixtures
         {
             BusinessBaseServerFactory<Product> _factory = new BusinessBaseServerFactory<Product>(_repository);
 
-            using (_mocks.Record())
-            {
-                Expect.Call(() => _repository.Update(null)).IgnoreArguments();
-            }
-            using (_mocks.Playback())
-            {
-                Product product = Product.GetOldProduct();
-                _factory.Update(product);
-            }
+            Product product = Product.GetOldProduct();
+            product.Name = "Updated Data";
+            _factory.Update(product);
+
+            _repository.AssertWasCalled(x => x.Update(product));
+            unitOfWorkStub.AssertWasCalled(x => x.TransactionalFlush());
         }
 
         [TestMethod]
-        public void BusinessBaseFactory_Calls__Repository_Delete()
+        public void BusinessBaseFactory_Calls__Repository_Delete_with_Criteria()
         {
             BusinessBaseServerFactory<Product> _factory = new BusinessBaseServerFactory<Product>(_repository);
 
-            using (_mocks.Record())
-            {
-                Expect.Call(() => _repository.Delete(null)).IgnoreArguments();
-            }
-            using (_mocks.Playback())
-            {
-                Product product = Product.GetOldProduct();
-                _factory.Delete(new SingleCriteria<Product, int>(32));
-            }
+            _factory.Delete(new SingleCriteria<Product, int>(32));
+
+            _repository.AssertWasCalled(x => x.Load(null, null), y => y.IgnoreArguments());
+            _repository.AssertWasCalled(x => x.Delete(null),y=> y.IgnoreArguments());
+            unitOfWorkStub.AssertWasCalled(x => x.TransactionalFlush());
+        }
+
+        [TestMethod]
+        public void BusinessBaseFactory_Calls_Repository_Delete_with_Object()
+        {
+            BusinessBaseServerFactory<Product> _factory = new BusinessBaseServerFactory<Product>(_repository);
+
+            Product product = Product.GetOldProduct();
+            _factory.Delete(product);
+
+            _repository.AssertWasCalled(x => x.Delete(product));
+            unitOfWorkStub.AssertWasCalled(x => x.TransactionalFlush());
         }
 
         [TestMethod]
@@ -159,17 +139,13 @@ namespace ProjectTracker.Library.Tests.FactoryFixtures
         {
             BusinessBaseServerFactory<Product> _factory = new BusinessBaseServerFactory<Product>(_repository);
 
-            using (_mocks.Record())
-            {
-                Expect.Call(() => _repository.Delete(null)).IgnoreArguments();
-            }
-            using (_mocks.Playback())
-            {
-                Product product = Product.GetOldProduct();
-                product.MarkDeleted();
-                _factory.Update(product);
-            }
+            Product product = Product.GetOldProduct();
+            product.MarkDeleted();
+            _factory.Update(product);
+
+            _repository.AssertWasCalled(x => x.Delete(product));
+            unitOfWorkStub.AssertWasCalled(x => x.TransactionalFlush());
         }
-        
+
     }
 }

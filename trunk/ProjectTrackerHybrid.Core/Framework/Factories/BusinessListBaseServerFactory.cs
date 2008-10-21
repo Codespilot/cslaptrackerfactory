@@ -17,7 +17,7 @@ namespace ProjectTracker.Library.Framework.Factories
 
     public class BusinessListBaseServerFactory<L, I> :
         AbstractServerBusinessFactory<L>, IBusinessListBaseServerFactory<L, I>
-        where L : PTBusinessListBase<L,I>
+        where L : PTBusinessListBase<L, I>
         where I : PTBusinessBase<I>
     {
         private readonly IRepository<I> _repository;
@@ -44,7 +44,7 @@ namespace ProjectTracker.Library.Framework.Factories
             MarkNew(obj);
             return obj;
         }
-        
+
         public override L Fetch()
         {
             L list = (L)Activator.CreateInstance(typeof(L), true);
@@ -53,7 +53,7 @@ namespace ProjectTracker.Library.Framework.Factories
 
             using (UnitOfWork.Start(DatabaseKey))
             {
-               _list = _repository.FindAll(DetachedCriteria.For(typeof (I)));
+                _list = _repository.FindAll(DetachedCriteria.For(typeof(I)));
             }
             foreach (I item in _list)
             {
@@ -70,10 +70,10 @@ namespace ProjectTracker.Library.Framework.Factories
         {
             if (criteria != null)
             {
-                var list = (L) Activator.CreateInstance(typeof (L), true);
+                var list = (L)Activator.CreateInstance(typeof(L), true);
                 IList<I> _list;
 
-                using(UnitOfWork.Start(DatabaseKey))
+                using (UnitOfWork.Start(DatabaseKey))
                 {
                     NHibernate.ICriteria crit = _repository.CreateCriteria();
 
@@ -82,7 +82,7 @@ namespace ProjectTracker.Library.Framework.Factories
                 }
 
                 list.RaiseListChangedEvents = false;
-                
+
                 foreach (var item in _list)
                 {
                     list.Add(item);
@@ -91,56 +91,33 @@ namespace ProjectTracker.Library.Framework.Factories
                 list.RaiseListChangedEvents = true;
                 MarkOld(list);
                 return list;
-                
+
             }
             return Fetch();
         }
 
         public L Update(L obj)
         {
-            //go through the deleted list
+            using (UnitOfWork.Start(DatabaseKey))
+            {
+                //go through the deleted list
             foreach (I item in obj.GetDeletedList())
-            {
-                if (UnitOfWork.IsStarted)
-                    _repository.Delete(item);
-                else
-                {
-                    using (UnitOfWork.Start(DatabaseKey))
-                    {
-                        _repository.Delete(item);
-                        UnitOfWork.Current.TransactionalFlush();
-                        UnitOfWork.CurrentSession(DatabaseKey).Clear();
-                    }
-                }
-            }
+               _repository.Delete(item);
 
-            foreach (I item in obj)
-            {
-                
-                if (item.IsDirty)
+                foreach (I item in obj)
                 {
-                    if (UnitOfWork.IsStarted)
+                    if (item.IsDirty)
                     {
                         if (item.IsNew)
                             _repository.Save(item);
                         else
                             _repository.SaveOrUpdate(item);
                     }
-                    else
-                    {
-                        using (UnitOfWork.Start(DatabaseKey))
-                        {
-                            if (item.IsNew)
-                                _repository.Save(item);
-                            else
-                                _repository.SaveOrUpdate(item);
-                            UnitOfWork.Current.TransactionalFlush();
-                            UnitOfWork.CurrentSession(DatabaseKey).Clear();
-                        }
-                    }
                 }
+                UnitOfWork.Current.TransactionalFlush();
+                UnitOfWork.CurrentSession(DatabaseKey).Clear();
             }
-          
+
             MarkOld(obj);
             return obj;
         }

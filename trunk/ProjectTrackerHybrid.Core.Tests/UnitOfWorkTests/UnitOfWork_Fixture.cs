@@ -4,6 +4,8 @@ using Rhino.Mocks;
 
 #if !NUNIT
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using StructureMap;
+
 #else
 using NUnit.Framework;
 using TestClass = NUnit.Framework.TestFixtureAttribute;
@@ -46,7 +48,6 @@ namespace ProjectTracker.Library.Tests
     /// Summary description for UnitOfWork_Fixture
     /// </summary>
     [TestClass]
-    [Ignore]
     public class UnitOfWork_Fixture : FixtureBase
     {
         Rhino.Mocks.MockRepository _mocks = new Rhino.Mocks.MockRepository();
@@ -77,15 +78,19 @@ namespace ProjectTracker.Library.Tests
 
 
         [TestMethod]
+        [Ignore]
         public void Can_Start_UnitOfWork()
         {
+            //SetupTest();
             var factory = _mocks.DynamicMock<IUnitOfWorkFactory>();
             var unitOfWork = _mocks.DynamicMock<IUnitOfWork>();
 
-            var fieldInfo = typeof(UnitOfWork).GetField("_unitOfWorkFactory",
-                BindingFlags.Static | BindingFlags.SetField | BindingFlags.NonPublic);
+            
 
-            fieldInfo.SetValue(null, factory);
+            //var fieldInfo = typeof(UnitOfWork).GetField("_unitOfWorkFactory",
+            //    BindingFlags.Static | BindingFlags.SetField | BindingFlags.NonPublic);
+
+            //fieldInfo.SetValue(null, factory);
 
             using (_mocks.Record())
             {
@@ -93,6 +98,7 @@ namespace ProjectTracker.Library.Tests
             }
             using (_mocks.Playback())
             {
+                ObjectFactory.Inject<IUnitOfWorkFactory>(factory);
                 var uow = UnitOfWork.Start(dbKey);
             }
 
