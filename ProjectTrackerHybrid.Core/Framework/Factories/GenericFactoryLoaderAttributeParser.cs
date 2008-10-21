@@ -44,7 +44,7 @@ namespace ProjectTracker.Library.Framework.Factories
 
         public string RepositoryType
         {
-            get { throw new System.NotImplementedException(); }
+            get { throw new System.NotImplementedException("Repository Type on Object Factory Attribute is not supported yet"); }
         }
 
         public void Parse(string @string)

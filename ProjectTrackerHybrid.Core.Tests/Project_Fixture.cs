@@ -10,7 +10,6 @@ using ProjectTracker.Library.Framework.Factories;
 using Rhino.Mocks;
 using StructureMap.Attributes;
 using StructureMap.Configuration;
-using StructureMap.Configuration.DSL;
 using StructureMap.Graph;
 using StructureMap.Pipeline;
 using StructureMap;
@@ -76,9 +75,9 @@ namespace ProjectTracker.Library.Tests
             _loader = _mocks.DynamicMock<IObjectFactoryLoader>();
 
             //_loader = _mocks.DynamicMock<GenericFactoryLoader>();
-            PTRegistry registry = new PTRegistry();
+            PTTestRegistry testRegistry = new PTTestRegistry();
 
-            ObjectFactory.Initialize(x => x.AddRegistry(registry));
+            ObjectFactory.Initialize(x => x.AddRegistry(testRegistry));
 
             SetupResult
                 .For(
@@ -138,33 +137,4 @@ namespace ProjectTracker.Library.Tests
             }
         }
     }
-
-
-    public class PTRegistry : Registry
-    {
-        public PTRegistry()
-        {
-            ForRequestedType(typeof(IRepository<>))
-                .TheDefaultIsConcreteType(typeof(Repository<>));
-
-            ForRequestedType(typeof(IReadOnlyListServerFactory<,>)).TheDefaultIsConcreteType(
-                typeof(ReadOnlyListServerFactory<,>));
-
-            ForRequestedType(typeof(IBusinessBaseServerFactory<>))
-                .TheDefaultIsConcreteType(typeof(BusinessBaseServerFactory<>));
-
-
-            ForRequestedType(typeof(INameValueListServerFactory<,,,>)).TheDefaultIsConcreteType(
-                typeof(NameValueListServerFactory<,,,>));
-
-            ForRequestedType(typeof(IBusinessListBaseServerFactory<,>))
-                .TheDefaultIsConcreteType(typeof(BusinessListBaseServerFactory<,>));
-
-            ForRequestedType(typeof(IReadOnlyBaseServerFactory<>))
-                .TheDefaultIsConcreteType(typeof(ReadOnlyBaseServerFactory<>));
-
-        }
-
-    }
-   
 }

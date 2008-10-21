@@ -18,7 +18,6 @@ namespace ProjectTracker.Library.Tests
     /// Summary description for Test_Usage_Of_UnitOfWork_Fixture
     /// </summary>
     [TestClass]
-    [Ignore]
     public class Test_Usage_Of_UnitOfWork_Fixture : FixtureBase
     {
 

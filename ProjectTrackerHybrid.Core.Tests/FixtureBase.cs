@@ -1,5 +1,10 @@
 ﻿#if !NUNIT
+using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NHibernate;
+using Rhino.Mocks;
+using StructureMap;
+
 #else
 using NUnit.Framework;
 using TestClass = NUnit.Framework.TestFixtureAttribute;
@@ -13,6 +18,25 @@ namespace ProjectTracker.Library.Tests
 {
     public class FixtureBase
     {
+
+        protected IUnitOfWork unitOfWorkStub;
+        protected IDisposable disposeGlobalUnitOfWorkRegistration;
+        protected ISession sessionStub;
+
+        public FixtureBase()
+        {
+            ObjectFactory.Initialize(x => x.AddRegistry(new PTTestRegistry()));
+        }
+
+        protected void SetupTest()
+        {
+            unitOfWorkStub = MockRepository.GenerateStub<IUnitOfWork>();
+            disposeGlobalUnitOfWorkRegistration = UnitOfWork.RegisterGlobalUnitOfWork(unitOfWorkStub);
+            sessionStub = MockRepository.GenerateStub<ISession>();
+
+            UnitOfWork.SetCurrentSession("TEST", sessionStub);
+
+        }
 
 #if !NUNIT
         #region TestContext
@@ -35,5 +59,10 @@ namespace ProjectTracker.Library.Tests
         }
         #endregion
 #endif
+
+        protected void CleanupTest()
+        {
+            disposeGlobalUnitOfWorkRegistration.Dispose();
+        }
     }
 }

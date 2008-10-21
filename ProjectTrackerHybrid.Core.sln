@@ -11,8 +11,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Lib", "Lib", "{1ACC10C1-8F6
 		Lib\Rhino.Mocks.dll = Lib\Rhino.Mocks.dll
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PTConsole", "PTConsole\PTConsole.csproj", "{58C71AAD-C0BC-4640-902F-63A6A3275391}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProjectTracker.Library.Tests", "ProjectTrackerHybrid.Core.Tests\ProjectTracker.Library.Tests.csproj", "{52243D92-8450-416C-9E20-C8A235420097}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{A1C5B264-2A52-47B1-96B0-17676157ED25}"
@@ -36,10 +34,6 @@ Global
 		{F3EDBC65-1038-4268-99CA-DDF271D35728}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F3EDBC65-1038-4268-99CA-DDF271D35728}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F3EDBC65-1038-4268-99CA-DDF271D35728}.Release|Any CPU.Build.0 = Release|Any CPU
-		{58C71AAD-C0BC-4640-902F-63A6A3275391}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{58C71AAD-C0BC-4640-902F-63A6A3275391}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{58C71AAD-C0BC-4640-902F-63A6A3275391}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{58C71AAD-C0BC-4640-902F-63A6A3275391}.Release|Any CPU.Build.0 = Release|Any CPU
 		{52243D92-8450-416C-9E20-C8A235420097}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{52243D92-8450-416C-9E20-C8A235420097}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{52243D92-8450-416C-9E20-C8A235420097}.Release|Any CPU.ActiveCfg = Release|Any CPU

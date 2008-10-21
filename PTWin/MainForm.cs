@@ -8,11 +8,8 @@ using System.Text;
 using System.Windows.Forms;
 using ProjectTracker.Library;
 using Csla.Security;
-using ProjectTracker.Library.Data;
-using ProjectTracker.Library.Framework.Factories;
 using ProjectTracker.Library.Mapping.Helpers;
 using StructureMap;
-using StructureMap.Configuration.DSL;
 
 namespace PTWin
 {
@@ -20,7 +17,10 @@ namespace PTWin
   {
     public MainForm()
     {
+        // For NHibernate Logging - don't really need
         log4net.Config.XmlConfigurator.Configure();
+
+        /// Have to have this, it tells StructureMap what to do - Could move to Program.cs
         ObjectFactory.Initialize(x => x.AddRegistry(new PTRegistry()));
 
         /// Generate the XML Mapping Documents for debugging/reference           
@@ -483,31 +483,5 @@ namespace PTWin
     }
 
     #endregion
-  }
-
-  public class PTRegistry : Registry
-  {
-      public PTRegistry()
-      {
-          ForRequestedType(typeof(IRepository<>))
-              .TheDefaultIsConcreteType(typeof(Repository<>));
-
-          ForRequestedType(typeof(IReadOnlyListServerFactory<,>)).TheDefaultIsConcreteType(
-              typeof(ReadOnlyListServerFactory<,>));
-
-          ForRequestedType(typeof(IBusinessBaseServerFactory<>))
-              .TheDefaultIsConcreteType(typeof(BusinessBaseServerFactory<>));
-
-          ForRequestedType(typeof(INameValueListServerFactory<,,,>)).TheDefaultIsConcreteType(
-              typeof(NameValueListServerFactory<,,,>));
-
-          ForRequestedType(typeof(IBusinessListBaseServerFactory<,>))
-              .TheDefaultIsConcreteType(typeof(BusinessListBaseServerFactory<,>));
-
-          ForRequestedType(typeof(IReadOnlyBaseServerFactory<>))
-              .TheDefaultIsConcreteType(typeof(ReadOnlyBaseServerFactory<>));
-
-      }
-
   }
 }

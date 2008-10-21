@@ -146,6 +146,7 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
+    <Compile Include="PTRegistry.cs" />
     <Compile Include="ResourceEdit.cs">
       <SubType>UserControl</SubType>
     </Compile>
