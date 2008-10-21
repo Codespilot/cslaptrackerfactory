@@ -11,24 +11,49 @@ using CslaFactory = Csla.Server.ObjectFactoryAttribute;
 
 namespace ProjectTracker.Library
 {
+    // Note new attributes and signature change of class
     [CslaFactory("Factory Type=IBusinessBaseServerFactory;Item Type=ProjectTracker.Library.Resource, ProjectTracker.Library")]
     [DatabaseKey(Database.PTrackerDb)]
     [Serializable()]
     public class Resource : PTBusinessBase<Resource>
     {
-        #region  Business Methods
+        #region New/Modified Business Methods
 
-        private byte[] _timestamp = new byte[8];
+        /// <summary>
+        /// This is modified from the Csla Default to be null. This is so
+        /// NHibernate knows what to do with the TimeStamp
+        /// </summary>
+        private byte[] timeStamp = null;
+
+        internal byte[] TimeStamp
+        {
+            get { return timeStamp; }
+            set { timeStamp = value; }
+        }
 
         private static PropertyInfo<int> IdProperty = RegisterProperty(new PropertyInfo<int>("Id"));
         public int Id
         {
-            get
-            {
-                return GetProperty<int>(IdProperty);
-            }
-            set { SetProperty(IdProperty, value);}
+            get { return GetProperty<int>(IdProperty); }
+            internal set { SetProperty(IdProperty, value); } // Added for NHibernate
         }
+
+        // Added for NHibernate mapping
+        internal IList<ResourceAssignment> AssignmentsSet
+        {
+            get { return Assignments as IList<ResourceAssignment>; }
+            set
+            {
+                foreach (ResourceAssignment assignment in value)
+                {
+                    if (!Assignments.Contains(assignment))
+                        Assignments.Add(assignment);
+                }
+            }
+        }
+        #endregion
+
+        #region  Business Methods
 
         private static PropertyInfo<string> LastNameProperty = RegisterProperty(new PropertyInfo<string>("LastName", "Last name"));
         private string _lastName = LastNameProperty.DefaultValue;
@@ -80,20 +105,6 @@ namespace ProjectTracker.Library
             }
         }
 
-        internal IList<ResourceAssignment> AssignmentsSet
-        {
-            get { return Assignments as IList<ResourceAssignment>; }
-            set
-            {
-                foreach (ResourceAssignment assignment in value)
-                {
-                    if(!Assignments.Contains(assignment))
-                        Assignments.Add(assignment);
-                }
-            }
-        }
-       
-
         public override string ToString()
         {
             return GetProperty<int>(IdProperty).ToString();
@@ -101,7 +112,7 @@ namespace ProjectTracker.Library
 
         #endregion
 
-        #region  Validation Rules
+        #region  Validation Rules - No Change
 
         protected override void AddBusinessRules()
         {
@@ -118,7 +129,7 @@ namespace ProjectTracker.Library
 
         #endregion
 
-        #region  Authorization Rules
+        #region  Authorization Rules - Commented Temporarily
 
         protected override void AddAuthorizationRules()
         {
@@ -138,7 +149,7 @@ namespace ProjectTracker.Library
 
         #endregion
 
-        #region  Factory Methods
+        #region  Factory Methods - No Change
 
         public static Resource NewResource()
         {
@@ -160,9 +171,71 @@ namespace ProjectTracker.Library
 
         #endregion
 
-        
+        #region  Data Access - Totally Commented
 
-        #region  Exists
+        //private void DataPortal_Fetch(SingleCriteria<Resource, int> criteria)
+        //{
+        //    using (var ctx = ContextManager<ProjectTracker.DalLinq.PTrackerDataContext>.GetManager(ProjectTracker.DalLinq.Database.PTracker))
+        //    {
+        //        var data = (from r in ctx.DataContext.Resources
+        //                    where r.Id == criteria.Value
+        //                    select r).Single();
+        //        _id = data.Id;
+        //        _lastName = data.LastName;
+        //        _firstName = data.FirstName;
+        //        _timestamp = data.LastChanged.ToArray();
+
+        //        LoadProperty<ResourceAssignments>(AssignmentsProperty, ResourceAssignments.GetResourceAssignments(data.Assignments.ToArray()));
+        //    }
+        //}
+
+        //[Transactional(TransactionalTypes.TransactionScope)]
+        //protected override void DataPortal_Insert()
+        //{
+        //    using (var ctx = ContextManager<ProjectTracker.DalLinq.PTrackerDataContext>.GetManager(ProjectTracker.DalLinq.Database.PTracker))
+        //    {
+        //        int? newId = null;
+        //        System.Data.Linq.Binary newLastChanged = null;
+        //        ctx.DataContext.addResource(_lastName, _firstName, ref newId, ref newLastChanged);
+        //        _id = System.Convert.ToInt32(newId);
+        //        _timestamp = newLastChanged.ToArray();
+        //        FieldManager.UpdateChildren(this);
+        //    }
+        //}
+
+        //[Transactional(TransactionalTypes.TransactionScope)]
+        //protected override void DataPortal_Update()
+        //{
+        //    using (var ctx = ContextManager<ProjectTracker.DalLinq.PTrackerDataContext>.GetManager(ProjectTracker.DalLinq.Database.PTracker))
+        //    {
+        //        if (IsSelfDirty)
+        //        {
+        //            System.Data.Linq.Binary newLastChanged = null;
+        //            ctx.DataContext.updateResource(_id, _lastName, _firstName, _timestamp, ref newLastChanged);
+        //            _timestamp = newLastChanged.ToArray();
+        //        }
+        //        FieldManager.UpdateChildren(this);
+        //    }
+        //}
+
+        //[Transactional(TransactionalTypes.TransactionScope)]
+        //protected override void DataPortal_DeleteSelf()
+        //{
+        //    DataPortal_Delete(new SingleCriteria<Resource, int>(_id));
+        //}
+
+        //[Transactional(TransactionalTypes.TransactionScope)]
+        //private void DataPortal_Delete(SingleCriteria<Resource, int> criteria)
+        //{
+        //    using (var ctx = ContextManager<ProjectTracker.DalLinq.PTrackerDataContext>.GetManager(ProjectTracker.DalLinq.Database.PTracker))
+        //    {
+        //        ctx.DataContext.deleteResource(criteria.Value);
+        //    }
+        //}
+
+        #endregion
+
+        #region  Exists - Not Converted Yet
 
         public static bool Exists(int id)
         {
@@ -208,6 +281,8 @@ namespace ProjectTracker.Library
 
         #endregion
 
+        #region Base Class Overrides / NHibernate Helpers
+
         private NHibernate.ICriteria _iCriteria = null;
 
         public override void SetNHibernateCriteria(object businessCriteria, NHibernate.ICriteria nhibernateCriteria)
@@ -251,6 +326,7 @@ namespace ProjectTracker.Library
             _iCriteria.Add(expression);
         }
 
+        #endregion
 
     }
 }

@@ -13,12 +13,6 @@ namespace ProjectTracker.Library.Mapping
 
             WithTable("Projects");
 
-            //WithTable("Assignments", m =>
-            //                             {
-            //                                 m.WithKeyColumn("ProjectId");
-            //                                 m.Map(x => x.Id,"ProjectId");
-            //                             });
-
             Id(x => x.Id)
                 .GeneratedBy
                 .GuidComb()
@@ -32,13 +26,7 @@ namespace ProjectTracker.Library.Mapping
             Map(x => x.Ended);
             Map(x => x.Description);
 
-            //HasManyComposite<ProjectResource>(p =>
-            //                                      {
-            //                                          p.Map(n => n.Assigned);
-            //                                          p.Map(n => n.Role);
-            //                                          p.References(r => r.Resource, "ResourceId");
-            //                                      });
-
+            
             HasMany<ProjectResource>(x => x.ResourcesSet)
                 .AsBag()
                 .Cascade.All()
@@ -51,6 +39,26 @@ namespace ProjectTracker.Library.Mapping
                                    p.Map(n => n.Role);
                                    p.References(r => r.Resource, "ResourceId");
                                });
+
+            //Version(x => x.TimeStamp)
+            //    .TheColumnNameIs("LastChanged");
+
+
+
+            //WithTable("Assignments", m =>
+            //                             {
+            //                                 m.WithKeyColumn("ProjectId");
+            //                                 m.Map(x => x.Id,"ProjectId");
+            //                             });
+
+
+            //HasManyComposite<ProjectResource>(p =>
+            //                                      {
+            //                                          p.Map(n => n.Assigned);
+            //                                          p.Map(n => n.Role);
+            //                                          p.References(r => r.Resource, "ResourceId");
+            //                                      });
+
 
             //CompositeElementPart<ProjectResource> part = new CompositeElementPart<ProjectResource>();
 

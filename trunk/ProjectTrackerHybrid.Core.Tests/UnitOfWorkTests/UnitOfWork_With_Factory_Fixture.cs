@@ -162,6 +162,7 @@ namespace ProjectTracker.Library.Tests
     /// Summary description for UnitOfWork_With_Factory_Fixture
     /// </summary>
     [TestClass]
+    [Ignore]
     public class UnitOfWork_With_Factory_Fixture : FixtureBase
     {
         private string dbKey = "PTracker";

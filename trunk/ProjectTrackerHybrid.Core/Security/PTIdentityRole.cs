@@ -8,6 +8,8 @@ using ProjectTracker.Library.Framework;
 
 namespace ProjectTracker.Library.Security
 {
+    //New Class for use with NHibernate
+    // Note new Attributes and Class signature
     [ObjectFactory("Factory Type=IReadOnlyBaseServerFactory;Item Type=ProjectTracker.Library.Security.PTIdentityRole, ProjectTracker.Library")]
     [DatabaseKey(Database.PTSecurityDb)]
     [Serializable]

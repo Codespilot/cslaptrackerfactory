@@ -20,6 +20,7 @@ namespace ProjectTracker.Library.Tests
     /// Summary description for LocalData_Fixture
     /// </summary>
     [TestClass]
+    [Ignore]
     public class LocalData_Fixture : FixtureBase
     {
         

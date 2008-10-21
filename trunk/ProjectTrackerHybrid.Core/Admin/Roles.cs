@@ -1,8 +1,11 @@
 ﻿using Csla;
+using Csla.C5;
 using Csla.Data;
 using Csla.Security;
 using System;
+using ProjectTracker.Library.Data;
 using ProjectTracker.Library.Framework;
+using CslaFactory = Csla.Server.ObjectFactoryAttribute;
 
 namespace ProjectTracker.Library.Admin
 {
@@ -11,6 +14,9 @@ namespace ProjectTracker.Library.Admin
     /// Used to maintain the list of roles
     /// in the system.
     /// </summary>
+    // Note new attributes and signature change of class
+    [CslaFactory("Factory Type=IBusinessListBaseServerFactory;List Type=ProjectTracker.Library.Admin.Roles;Item Type=ProjectTracker.Library.Admin.Role, ProjectTracker.Library")]
+    [DatabaseKey(Database.PTrackerDb)]
     [Serializable()]
     public class Roles : PTBusinessListBase<Roles, Role>
     {
@@ -48,6 +54,7 @@ namespace ProjectTracker.Library.Admin
                 }
             }
             return null;
+            
         }
 
         protected override object AddNewCore()
@@ -59,14 +66,14 @@ namespace ProjectTracker.Library.Admin
 
         #endregion
 
-        #region  Authorization Rules
+        #region  Authorization Rules - Commented Out Temporarily
 
         protected static void AddObjectAuthorizationRules()
         {
             // add object-level authorization rules here
-            AuthorizationRules.AllowCreate(typeof(Roles), "Administrator");
-            AuthorizationRules.AllowEdit(typeof(Roles), "Administrator");
-            AuthorizationRules.AllowDelete(typeof(Roles), "Administrator");
+            //AuthorizationRules.AllowCreate(typeof(Roles), "Administrator");
+            //AuthorizationRules.AllowEdit(typeof(Roles), "Administrator");
+            //AuthorizationRules.AllowDelete(typeof(Roles), "Administrator");
         }
 
         #endregion
@@ -82,11 +89,12 @@ namespace ProjectTracker.Library.Admin
         {
             this.Saved += new EventHandler<Csla.Core.SavedEventArgs>(Roles_Saved);
             this.AllowNew = true;
+            this.AllowRemove = true;
         }
 
         #endregion
 
-        #region  Data Access
+        #region  Data Access - Partially Commented
 
         private void Roles_Saved(object sender, Csla.Core.SavedEventArgs e)
         {

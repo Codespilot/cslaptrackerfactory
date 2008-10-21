@@ -12,7 +12,7 @@ namespace ProjectTracker.Library
     [Serializable()]
     public class ResourceList : PTReadOnlyListBase<ResourceList, ResourceInfo>
     {
-        #region  Factory Methods
+        #region  Factory Methods - No Change
 
         public static ResourceList EmptyList()
         {
@@ -29,7 +29,7 @@ namespace ProjectTracker.Library
 
         #endregion
 
-        #region  Data Access
+        #region  Data Access - Totally Commented
 
         //private void DataPortal_Fetch()
         //{

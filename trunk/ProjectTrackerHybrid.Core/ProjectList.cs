@@ -4,7 +4,6 @@ using System.Linq;
 using System.Text;
 using Csla;
 using Csla.Server;
-using ProjectTracker.Library.Data;
 using ProjectTracker.Library.Framework;
 using DataPortal=Csla.DataPortal;
 
@@ -14,76 +13,57 @@ namespace ProjectTracker.Library
     [Serializable]
     public class ProjectList : PTReadOnlyListBase<ProjectList, ProjectInfo>
     {
-        public static ProjectList NewProjectList()
-        {
-            return DataPortal.Create<ProjectList>();
-
-        }
+        #region  Factory Methods
 
         public static ProjectList GetProjectList()
         {
             return DataPortal.Fetch<ProjectList>();
-
         }
 
-        public static ProjectList GetProjectList(string projectName)
+        public static ProjectList GetProjectList(string name)
         {
-            return DataPortal.Fetch<ProjectList>(new SingleCriteria<ProjectList, string>(projectName));
+            return DataPortal.Fetch<ProjectList>(new SingleCriteria<ProjectList, string>(name));
         }
 
+        private ProjectList()
+        { /* require use of factory methods */ }
 
-    }
+        #endregion
 
-    [DatabaseKey(Database.PTrackerDb)]
-    [Serializable]
-    public class ProjectInfo : PTReadOnlyBase<ProjectInfo>
-    {
-        private Guid _id;
-        private string _name;
+        #region  Data Access - Totally Commented
 
-        public Guid Id
-        {
-            get
-            {
-                return _id;
-            }
-            internal set
-            {
-                _id = value;
-            }
-        }
+        //private void DataPortal_Fetch()
+        //{
+        //    // fetch with no filter
+        //    Fetch("");
+        //}
 
-        public string Name
-        {
-            get
-            {
-                return _name;
-            }
-            internal set
-            {
-                _name = value;
-            }
-        }
+        //private void DataPortal_Fetch(Csla.SingleCriteria<ProjectList, string> criteria)
+        //{
+        //    Fetch(criteria.Value);
+        //}
 
-        protected override object GetIdValue()
-        {
-            return _id;
-        }
+        //private void Fetch(string nameFilter)
+        //{
+        //    RaiseListChangedEvents = false;
+        //    using (var ctx = ContextManager<ProjectTracker.DalLinq.PTrackerDataContext>.GetManager(ProjectTracker.DalLinq.Database.PTracker))
+        //    {
+        //        var data = from p in ctx.DataContext.Projects
+        //                   select new ProjectInfo(p.Id, p.Name);
+        //        if (!(string.IsNullOrEmpty(nameFilter)))
+        //        {
+        //            data = from p in ctx.DataContext.Projects
+        //                   where p.Name.Contains(nameFilter)
+        //                   select new ProjectInfo(p.Id, p.Name);
+        //        }
+        //        IsReadOnly = false;
+        //        this.AddRange(data);
+        //        IsReadOnly = true;
+        //    }
+        //    RaiseListChangedEvents = true;
+        //}
 
-        public override string ToString()
-        {
-            return _name;
-        }
+        #endregion
 
-        private ProjectInfo()
-        {
-            // require use of factory methods
-        }
-
-        internal ProjectInfo(Guid id, string name)
-        {
-            _id = id;
-            _name = name;
-        }
     }
 }

@@ -18,7 +18,7 @@ namespace ProjectTracker.Library.Framework.Factories
     public class BusinessListBaseServerFactory<L, I> :
         AbstractServerBusinessFactory<L>, IBusinessListBaseServerFactory<L, I>
         where L : PTBusinessListBase<L,I>
-        where I : PTBusinessBase<I>, new()
+        where I : PTBusinessBase<I>
     {
         private readonly IRepository<I> _repository;
 
@@ -43,23 +43,22 @@ namespace ProjectTracker.Library.Framework.Factories
             var obj = (L)Activator.CreateInstance(typeof(L), true);
             MarkNew(obj);
             return obj;
-
         }
-
+        
         public override L Fetch()
         {
             L list = (L)Activator.CreateInstance(typeof(L), true);
-
-
             list.RaiseListChangedEvents = false;
+            IList<I> _list;
 
-
-            IList<I> _list = _repository.FindAll(DetachedCriteria.For(typeof(I)));
-
+            using (UnitOfWork.Start(DatabaseKey))
+            {
+               _list = _repository.FindAll(DetachedCriteria.For(typeof (I)));
+            }
             foreach (I item in _list)
             {
-
                 list.Add(item);
+                MarkOld(item);
             }
             MarkOld(list);
             list.RaiseListChangedEvents = true;
@@ -99,43 +98,51 @@ namespace ProjectTracker.Library.Framework.Factories
 
         public L Update(L obj)
         {
-            foreach (I item in obj)
+            //go through the deleted list
+            foreach (I item in obj.GetDeletedList())
             {
-                if (item.IsDeleted)
+                if (UnitOfWork.IsStarted)
+                    _repository.Delete(item);
+                else
                 {
-                    if (UnitOfWork.IsStarted)
+                    using (UnitOfWork.Start(DatabaseKey))
+                    {
                         _repository.Delete(item);
-                    else
-                    {
-                        using (UnitOfWork.Start(DatabaseKey))
-                        {
-                            _repository.Delete(item);
-                          
-                        }
-                    }
-                }
-                else if (item.IsDirty)
-                {
-
-                    if (UnitOfWork.IsStarted)
-                        _repository.SaveOrUpdate(item);
-                    else
-                    {
-                        using (UnitOfWork.Start(DatabaseKey))
-                        {
-                            _repository.SaveOrUpdate(item);
-                        }
+                        UnitOfWork.Current.TransactionalFlush();
+                        UnitOfWork.CurrentSession(DatabaseKey).Clear();
                     }
                 }
             }
 
-            UnitOfWork.Current.TransactionalFlush();
-            UnitOfWork.CurrentSession(DatabaseKey).Clear();
+            foreach (I item in obj)
+            {
+                
+                if (item.IsDirty)
+                {
+                    if (UnitOfWork.IsStarted)
+                    {
+                        if (item.IsNew)
+                            _repository.Save(item);
+                        else
+                            _repository.SaveOrUpdate(item);
+                    }
+                    else
+                    {
+                        using (UnitOfWork.Start(DatabaseKey))
+                        {
+                            if (item.IsNew)
+                                _repository.Save(item);
+                            else
+                                _repository.SaveOrUpdate(item);
+                            UnitOfWork.Current.TransactionalFlush();
+                            UnitOfWork.CurrentSession(DatabaseKey).Clear();
+                        }
+                    }
+                }
+            }
+          
             MarkOld(obj);
             return obj;
         }
-
-        
-
     }
 }

@@ -18,12 +18,11 @@ namespace ProjectTracker.Library.Tests
     /// Summary description for UnitOfWorkImplementor_Fixture
     /// </summary>
     [TestClass]
+    [Ignore]
     public class UnitOfWorkImplementor_Fixture : FixtureBase
     {
         private string dbKey = "TEST";
 
-
-      
 
         #region Additional test attributes
         //

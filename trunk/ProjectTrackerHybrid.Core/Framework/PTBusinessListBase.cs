@@ -29,8 +29,16 @@ namespace ProjectTracker.Library.Framework
             }
             
             RaiseListChangedEvents = true;
-            
 
+        }
+
+        /// <summary>
+        /// Return the Deleted list
+        /// </summary>
+        /// <returns></returns>
+        internal IList<C> GetDeletedList()
+        {
+            return DeletedList;
         }
     }
 }

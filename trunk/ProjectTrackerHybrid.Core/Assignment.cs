@@ -12,6 +12,7 @@ namespace ProjectTracker.Library
 
     internal static class Assignment
     {
+        // No Change to this
         #region  Business Methods
 
         public static System.DateTime GetDefaultAssignedDate()
@@ -21,6 +22,7 @@ namespace ProjectTracker.Library
 
         #endregion
 
+        // No Change
         #region  Validation Rules
 
         /// <summary>
@@ -44,37 +46,36 @@ namespace ProjectTracker.Library
 
         #endregion
 
-        #region  Data Access
+        #region  Data Access - Totally Commented Out
 
-        public static byte[] AddAssignment(Guid projectId, int resourceId, SmartDate assigned, int role)
-        {
-            //using (var ctx = ContextManager<ProjectTracker.DalLinq.PTrackerDataContext>.GetManager(ProjectTracker.DalLinq.Database.PTracker))
-            //{
-            //    System.Data.Linq.Binary lastChanged = null;
-            //    ctx.DataContext.addAssignment(projectId, resourceId, assigned, role, ref lastChanged);
-            //    return lastChanged.ToArray();
-            //}
-            return new byte[0];
-        }
+        //public static byte[] AddAssignment(Guid projectId, int resourceId, SmartDate assigned, int role)
+        //{
+        //    using (var ctx = ContextManager<ProjectTracker.DalLinq.PTrackerDataContext>.GetManager(ProjectTracker.DalLinq.Database.PTracker))
+        //    {
+        //        System.Data.Linq.Binary lastChanged = null;
+        //        ctx.DataContext.addAssignment(projectId, resourceId, assigned, role, ref lastChanged);
+        //        return lastChanged.ToArray();
+        //    }
+        //}
 
-        public static byte[] UpdateAssignment(Guid projectId, int resourceId, SmartDate assigned, int newRole, byte[] timestamp)
-        {
-            //using (var ctx = ContextManager<ProjectTracker.DalLinq.PTrackerDataContext>.GetManager(ProjectTracker.DalLinq.Database.PTracker))
-            //{
-            //    System.Data.Linq.Binary lastChanged = null;
-            //    ctx.DataContext.updateAssignment(projectId, resourceId, assigned, newRole, timestamp, ref lastChanged);
-            //    return lastChanged.ToArray();
-            //}
-            return new byte[0];
-        }
+        //public static byte[] UpdateAssignment(Guid projectId, int resourceId, SmartDate assigned, int newRole, byte[] timestamp)
+        //{
+        //    using (var ctx = ContextManager<ProjectTracker.DalLinq.PTrackerDataContext>.GetManager(ProjectTracker.DalLinq.Database.PTracker))
+        //    {
+        //        System.Data.Linq.Binary lastChanged = null;
+        //        ctx.DataContext.updateAssignment(projectId, resourceId, assigned, newRole, timestamp, ref lastChanged);
+        //        return lastChanged.ToArray();
+        //    }
+        //}
 
-        public static void RemoveAssignment(Guid projectId, int resourceId)
-        {
-            /*using (var ctx = ContextManager<ProjectTracker.DalLinq.PTrackerDataContext>.GetManager(ProjectTracker.DalLinq.Database.PTracker))
-            {
-                ctx.DataContext.deleteAssignment(projectId, resourceId);
-            }*/
-        }
+        // NOT NEEDED
+        //public static void RemoveAssignment(Guid projectId, int resourceId)
+        //{
+        //    using (var ctx = ContextManager<ProjectTracker.DalLinq.PTrackerDataContext>.GetManager(ProjectTracker.DalLinq.Database.PTracker))
+        //    {
+        //        ctx.DataContext.deleteAssignment(projectId, resourceId);
+        //    }
+        //}
 
         #endregion
 
